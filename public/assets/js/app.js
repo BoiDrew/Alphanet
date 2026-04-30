@@ -100,6 +100,11 @@ window.submitRequest = function() {
     ts: Date.now()
   });
   saveRequests(requests);
+  ['f-name','f-site','f-product','f-qty','f-cost','f-supplier','f-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-priority').value = 'normal';
+  document.getElementById('f-cat').value = 'Cleaning chemicals';
+  document.getElementById('f-freq').value = 'one-off';
+  currentTab = document.getElementById('f-priority').value === 'urgent' ? 'urgent' : 'pending';
   rebuildFilters();
   showPage('list');
   render();
@@ -108,7 +113,15 @@ window.submitRequest = function() {
 
 /* Rendering */
 
+function setStatus(id, status) {
+  const r = requests.find(x => x.id === id);
+  if (r) { r.status = status; save(); render(); toast('Updated!'); }
+}
 
+function deleteReq(id) {
+  requests = requests.filter(x => x.id !== id);
+  save(); rebuildFilters(); render(); toast('Removed.');
+}
 
 function filtered() {
   const site = document.getElementById('filter-site').value;
@@ -177,8 +190,8 @@ function render() {
 
 
 function exportCSV() {
-  const headers = ['Date','Worker','Job site','Product','Category','Priority','Status','Unit cost','Supplier','Frequency','Notes'];
-  const rows = requests.map(r => [r.date,r.name,r.site||'',r.product,r.category||'',r.priority,r.status,r.cost!=null?r.cost.toFixed(2):'',r.supplier||'',r.frequency||'',r.notes||''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+  const headers = ['Date','Worker','Job site','Product','Category','Qty','Priority','Status','Supplier','Frequency','Notes'];
+  const rows = requests.map(r => [r.date,r.name,r.site||'',r.product,r.category||'',r.qty||'',r.priority,r.status,r.supplier||'',r.frequency||'',r.notes||''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
   const csv = [headers.join(','), ...rows].join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);

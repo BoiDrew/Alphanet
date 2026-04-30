@@ -1,12 +1,63 @@
-async function load() {
-  try {
-    const r = await window.storage.get(SK, true);
-    if (r && r.value) requests = JSON.parse(r.value);
-  } catch(e) { requests = []; }
-  rebuildFilters();
-  render();
+const STORAGE_KEY =
+"cleaning_requests_v2";
+
+/* Load */
+
+export function loadRequests() {
+
+try {
+
+const data =
+localStorage.getItem(
+STORAGE_KEY
+);
+
+return data
+? JSON.parse(data)
+: [];
+
 }
 
-async function save() {
-  try { await window.storage.set(SK, JSON.stringify(requests), true); } catch(e) {}
+catch (e) {
+
+console.error(
+"Load failed:",
+e
+);
+
+return [];
+
+}
+
+}
+
+/* Save */
+
+export function saveRequests(
+requests
+) {
+
+try {
+
+localStorage.setItem(
+
+STORAGE_KEY,
+
+JSON.stringify(
+requests
+)
+
+);
+
+}
+
+catch (e) {
+
+console.error(
+"Save failed:",
+e
+);
+
+}
+
 }

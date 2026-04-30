@@ -5,24 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Supply Request Tracker</title>
   <link rel="stylesheet" href="assets/css/styles.css">
-  <link rel="icon" href="assets/images/favicon.ico">
-
 </head>
 
 <body>
 <div class="wrap" style="position:relative;">
-<h2 class="sr-only">
-  Cleaning company supply request tracker with analytics
-</h2>
+<h2 class="sr-only">Cleaning company supply request tracker with analytics</h2>
 
 <!-- HEADER -->
-
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px;">
   <div>
     <div style="font-size:18px;font-weight:500;color:var(--color-text-primary);">Supply request tracker</div>
     <div style="font-size:13px;color:var(--color-text-secondary);margin-top:2px;">Products, materials &amp; analytics</div>
   </div>
-
   <div style="display:flex;gap:8px;">
     <button class="btn btn-primary" onclick="gotoNew()">+ New request</button>
     <button class="btn" onclick="showPage('analytics')">Analytics</button>
@@ -30,7 +24,6 @@
 </div>
 
 <!-- Navigation -->
-
 <div class="nav" id="main-nav">
   <button class="tab active" onclick="switchTab('pending')">Pending <span class="cnt" id="cnt-pending">0</span></button>
   <button class="tab" onclick="switchTab('urgent')">Urgent <span class="cnt" id="cnt-urgent">0</span></button>
@@ -39,8 +32,7 @@
   <button class="tab" onclick="switchTab('all')">All <span class="cnt" id="cnt-all">0</span></button>
 </div>
 
-
-<!-- Pages -->
+<!-- LIST PAGE -->
 <div id="page-list">
   <div class="filter-row">
     <select id="filter-site" onchange="render()"><option value="">All job sites</option></select>
@@ -50,9 +42,8 @@
   <div id="list-body"></div>
 </div>
 
-<!-- NEW PAGE -->
+<!-- NEW REQUEST PAGE -->
 <div id="page-new" style="display:none;">
-
   <div class="card">
     <div style="font-size:15px;font-weight:500;margin-bottom:1rem;color:var(--color-text-primary);">New supply request</div>
     <div class="grid2">
@@ -89,7 +80,10 @@
         <label>Quantity needed</label>
         <input id="f-qty" type="text" placeholder="e.g. 2 boxes">
       </div>
-
+      <div class="form-row">
+        <label>Est. unit cost ($)</label>
+        <input id="f-cost" type="number" step="0.01" min="0" placeholder="e.g. 4.50">
+      </div>
       <div class="form-row">
         <label>Priority</label>
         <select id="f-priority">
@@ -108,7 +102,10 @@
           <option value="as needed">As needed</option>
         </select>
       </div>
-      
+      <div class="form-row">
+        <label>Preferred supplier</label>
+        <input id="f-supplier" type="text" placeholder="e.g. CleanCo, Amazon">
+      </div>
     </div>
     <div class="form-row">
       <label>Reason / notes</label>
@@ -121,7 +118,7 @@
   </div>
 </div>
 
-<!-- analytics -->
+<!-- ANALYTICS PAGE -->
 <div id="page-analytics" style="display:none;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
     <div style="font-size:15px;font-weight:500;color:var(--color-text-primary);">Analytics dashboard</div>
@@ -161,13 +158,6 @@
 
 <div class="toast" id="toast"></div>
 </div>
-
-<!-- Scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
-<script src="assets/js/app.js" defer></script>
-<script src="assets/js/analysis.js" defer></script>
-<script src="assets/js/storage.js" defer></script>
-<script src="assets/js/ui.js" defer></script>
-
+<script type="module" src="assets/js/app.js"></script>
 </body>
 </html>

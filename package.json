@@ -1,0 +1,9 @@
+{
+  "name": "cleaning-request-tracker",
+  "version": "1.0.0",
+  "description": "Supply request tracker with analytics",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo Build complete"
+  }
+}

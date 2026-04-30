@@ -2,29 +2,155 @@ import { loadRequests, saveRequests } from "./storage.js";
 import { toast } from "./ui.js";
 import { renderAnalytics } from "./analytics.js";
 
+/* ══════════════════════════════════════════
+   CONFIGURATION —  PIN 
+   ══════════════════════════════════════════ */
+const SUPERVISOR_PIN = "1234"; // ← change this before deploying
+
 /* ── State ── */
 let requests = [];
 let currentTab = "pending";
+let currentRole = null; // "worker" | "supervisor"
 
-/* ── Init ── */
+/* ══════════════════════════════════════════
+   ROLE GATE
+   ══════════════════════════════════════════ */
+
+// Expose gate functions globally (called from inline onclick)
+window.selectRole = function (role) {
+  if (role === "supervisor") {
+    // Show PIN prompt
+    document.getElementById("gate-pin-wrap").style.display = "";
+    document.getElementById("gate-pin").focus();
+    // Hide the two role buttons so user focuses on PIN entry
+    document.querySelector(".gate-btns").style.display = "none";
+    document.querySelector(".gate-sub").textContent = "Supervisor access";
+  } else {
+    // Workers go straight through
+    enterApp("worker");
+  }
+};
+
+window.confirmPin = function () {
+  const pin = document.getElementById("gate-pin").value;
+  const err = document.getElementById("gate-pin-error");
+  if (pin === SUPERVISOR_PIN) {
+    err.style.display = "none";
+    enterApp("supervisor");
+  } else {
+    err.style.display = "";
+    document.getElementById("gate-pin").value = "";
+    document.getElementById("gate-pin").focus();
+  }
+};
+
+window.cancelPin = function () {
+  document.getElementById("gate-pin-wrap").style.display = "none";
+  document.getElementById("gate-pin").value = "";
+  document.getElementById("gate-pin-error").style.display = "none";
+  document.querySelector(".gate-btns").style.display = "";
+  document.querySelector(".gate-sub").textContent = "Who are you signing in as?";
+};
+
+window.signOut = function () {
+  sessionStorage.removeItem("srt_role");
+  currentRole = null;
+  // Show gate, hide app
+  document.getElementById("gate").style.display = "";
+  document.getElementById("app").style.display = "none";
+  // Reset PIN UI in case supervisor was signed in
+  window.cancelPin();
+};
+
+function enterApp(role) {
+  currentRole = role;
+  sessionStorage.setItem("srt_role", role);
+  applyRole(role);
+  document.getElementById("gate").style.display = "none";
+  document.getElementById("app").style.display = "";
+}
+
+function applyRole(role) {
+  // Role pill label
+  const pill = document.getElementById("role-pill");
+  if (role === "supervisor") {
+    pill.textContent = "Supervisor";
+    pill.style.background = "#E6F1FB";
+    pill.style.color = "#185FA5";
+  } else {
+    pill.textContent = "Worker";
+    pill.style.background = "#EAF3DE";
+    pill.style.color = "#3B6D11";
+  }
+
+  // Show/hide role-specific elements
+  document.querySelectorAll(".mgmt-only").forEach(el => {
+    el.style.display = role === "supervisor" ? "" : "none";
+  });
+
+  if (role === "supervisor") {
+    document.getElementById("header-sub").textContent = "Products, materials & analytics";
+    // Supervisor starts on the list page
+    showPage("list");
+    render();
+  } else {
+    document.getElementById("header-sub").textContent = "Submit a supply request";
+    // Workers go straight to the form
+    showPage("new");
+    document.getElementById("worker-success").style.display = "none";
+    document.getElementById("form-card").style.display = "";
+  }
+}
+
+/* ══════════════════════════════════════════
+   INIT
+   ══════════════════════════════════════════ */
 function init() {
   requests = loadRequests();
   rebuildFilters();
-  render();
+
+  // Resume session if role was already set this session
+  const savedRole = sessionStorage.getItem("srt_role");
+  if (savedRole) {
+    enterApp(savedRole);
+  }
+  // Otherwise the gate stays visible
 }
 
-/* ── Page navigation ── */
+/* ══════════════════════════════════════════
+   PAGE NAVIGATION
+   ══════════════════════════════════════════ */
 window.showPage = function (p) {
+  // Guard: workers cannot access list or analytics
+  if (currentRole === "worker" && (p === "list" || p === "analytics")) return;
+
   document.getElementById("page-list").style.display = p === "list" ? "" : "none";
   document.getElementById("page-new").style.display = p === "new" ? "" : "none";
   document.getElementById("page-analytics").style.display = p === "analytics" ? "" : "none";
-  document.getElementById("main-nav").style.display = p === "list" ? "" : "none";
+  document.getElementById("main-nav").style.display = (p === "list" && currentRole === "supervisor") ? "" : "none";
+
   if (p === "analytics") renderAnalytics(requests);
 };
 
 window.gotoNew = function () {
   rebuildSiteList();
+  // Reset form UI
+  document.getElementById("worker-success").style.display = "none";
+  document.getElementById("form-card").style.display = "";
   showPage("new");
+};
+
+/* Worker: show success screen, then allow another */
+window.workerNewRequest = function () {
+  document.getElementById("worker-success").style.display = "none";
+  document.getElementById("form-card").style.display = "";
+  // Clear form
+  ["f-name", "f-site", "f-product", "f-qty", "f-cost", "f-supplier", "f-notes"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("f-priority").value = "normal";
+  document.getElementById("f-cat").value = "Cleaning chemicals";
+  document.getElementById("f-freq").value = "one-off";
 };
 
 /* ── Tabs ── */
@@ -84,29 +210,36 @@ window.submitRequest = function () {
   });
 
   saveRequests(requests);
-
-  // Reset form
-  ["f-name", "f-site", "f-product", "f-qty", "f-cost", "f-supplier", "f-notes"].forEach(id => {
-    document.getElementById(id).value = "";
-  });
-  document.getElementById("f-priority").value = "normal";
-  document.getElementById("f-cat").value = "Cleaning chemicals";
-  document.getElementById("f-freq").value = "one-off";
-
-  currentTab = priority === "urgent" ? "urgent" : "pending";
   rebuildFilters();
-  showPage("list");
-  render();
-  toast("Request submitted!");
+
+  if (currentRole === "worker") {
+    // Show success screen instead of going to list
+    document.getElementById("form-card").style.display = "none";
+    document.getElementById("worker-success").style.display = "";
+  } else {
+    // Supervisor gets normal flow
+    ["f-name", "f-site", "f-product", "f-qty", "f-cost", "f-supplier", "f-notes"].forEach(id => {
+      document.getElementById(id).value = "";
+    });
+    document.getElementById("f-priority").value = "normal";
+    document.getElementById("f-cat").value = "Cleaning chemicals";
+    document.getElementById("f-freq").value = "one-off";
+    currentTab = priority === "urgent" ? "urgent" : "pending";
+    showPage("list");
+    render();
+    toast("Request submitted!");
+  }
 };
 
 /* ── Status / delete ── */
 window.setStatus = function (id, status) {
+  if (currentRole === "worker") return; // guard
   const r = requests.find(x => x.id === id);
   if (r) { r.status = status; saveRequests(requests); render(); toast("Updated!"); }
 };
 
 window.deleteReq = function (id) {
+  if (currentRole === "worker") return; // guard
   if (!confirm("Remove this request?")) return;
   requests = requests.filter(x => x.id !== id);
   saveRequests(requests); rebuildFilters(); render(); toast("Removed.");
@@ -130,7 +263,7 @@ function filtered() {
 }
 
 /* ── Render ── */
-window.render = function render() {
+window.render = function () {
   document.getElementById("cnt-pending").textContent = requests.filter(r => r.status === "pending" && r.priority !== "urgent").length;
   document.getElementById("cnt-urgent").textContent = requests.filter(r => r.status === "pending" && r.priority === "urgent").length;
   document.getElementById("cnt-ordered").textContent = requests.filter(r => r.status === "ordered").length;
@@ -198,7 +331,6 @@ window.exportCSV = function () {
 function escHtml(s) {
   return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
-
 
 /* ── Boot ── */
 document.addEventListener("DOMContentLoaded", init);

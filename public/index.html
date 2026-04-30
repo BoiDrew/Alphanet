@@ -8,23 +8,71 @@
 </head>
 
 <body>
+
+<!-- ══════════════════════════════════════════
+     ROLE GATE — shown before anything else
+     ══════════════════════════════════════════ -->
+<div id="gate" class="gate-wrap">
+  <div class="gate-card">
+    <div class="gate-logo"></div>
+    <div class="gate-title">Supply Request Tracker</div>
+    <div class="gate-sub">Who are you signing in as?</div>
+
+    <div class="gate-btns">
+      <button class="gate-btn" onclick="selectRole('worker')">
+        <span class="gate-btn-icon">👷</span>
+        <span class="gate-btn-label">Worker</span>
+        <span class="gate-btn-desc">Submit a new supply request</span>
+      </button>
+      <button class="gate-btn" onclick="selectRole('supervisor')">
+        <span class="gate-btn-icon">📋</span>
+        <span class="gate-btn-label">Supervisor</span>
+        <span class="gate-btn-desc">Manage requests &amp; analytics</span>
+      </button>
+    </div>
+
+    <!-- PIN prompt -->
+    <div id="gate-pin-wrap" style="display:none;margin-top:1.25rem;">
+      <div class="form-row" style="margin-bottom:8px;">
+        <label style="text-align:center;display:block;margin-bottom:6px;">Enter supervisor PIN</label>
+        <input id="gate-pin" type="password" inputmode="numeric" maxlength="8"
+               placeholder="••••" style="text-align:center;letter-spacing:4px;font-size:18px;"
+               onkeydown="if(event.key==='Enter')confirmPin()">
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;">
+        <button class="btn btn-primary" onclick="confirmPin()">Enter</button>
+        <button class="btn" onclick="cancelPin()">Back</button>
+      </div>
+      <div id="gate-pin-error" style="color:#A32D2D;font-size:12px;text-align:center;margin-top:8px;display:none;">
+        Incorrect PIN. Try again.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MAIN APP — hidden until role is set
+     ══════════════════════════════════════════ -->
+<div id="app" style="display:none;">
 <div class="wrap" style="position:relative;">
-<h2 class="sr-only">Cleaning company supply request tracker with analytics</h2>
+<h2 class="sr-only">Cleaning company supply request tracker</h2>
 
 <!-- HEADER -->
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px;">
   <div>
     <div style="font-size:18px;font-weight:500;color:var(--color-text-primary);">Supply request tracker</div>
-    <div style="font-size:13px;color:var(--color-text-secondary);margin-top:2px;">Products, materials &amp; analytics</div>
+    <div style="font-size:13px;color:var(--color-text-secondary);margin-top:2px;" id="header-sub">Products, materials &amp; analytics</div>
   </div>
-  <div style="display:flex;gap:8px;">
-    <button class="btn btn-primary" onclick="gotoNew()">+ New request</button>
-    <button class="btn" onclick="showPage('analytics')">Analytics</button>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="btn btn-primary mgmt-only" onclick="gotoNew()" style="display:none;">+ New request</button>
+    <button class="btn mgmt-only" onclick="showPage('analytics')" style="display:none;">Analytics</button>
+    <span id="role-pill" class="badge" style="font-size:11px;"></span>
+    <button class="btn btn-sm" onclick="signOut()">Sign out</button>
   </div>
 </div>
 
-<!-- Navigation -->
-<div class="nav" id="main-nav">
+<!-- Navigation (supervisor only) -->
+<div class="nav mgmt-only" id="main-nav" style="display:none;">
   <button class="tab active" onclick="switchTab('pending')">Pending <span class="cnt" id="cnt-pending">0</span></button>
   <button class="tab" onclick="switchTab('urgent')">Urgent <span class="cnt" id="cnt-urgent">0</span></button>
   <button class="tab" onclick="switchTab('ordered')">Ordered <span class="cnt" id="cnt-ordered">0</span></button>
@@ -32,8 +80,8 @@
   <button class="tab" onclick="switchTab('all')">All <span class="cnt" id="cnt-all">0</span></button>
 </div>
 
-<!-- LIST PAGE -->
-<div id="page-list">
+<!-- LIST PAGE (supervisor only) -->
+<div id="page-list" style="display:none;">
   <div class="filter-row">
     <select id="filter-site" onchange="render()"><option value="">All job sites</option></select>
     <select id="filter-cat" onchange="render()"><option value="">All categories</option></select>
@@ -44,7 +92,7 @@
 
 <!-- NEW REQUEST PAGE -->
 <div id="page-new" style="display:none;">
-  <div class="card">
+  <div id="form-card" class="card">
     <div style="font-size:15px;font-weight:500;margin-bottom:1rem;color:var(--color-text-primary);">New supply request</div>
     <div class="grid2">
       <div class="form-row">
@@ -113,12 +161,20 @@
     </div>
     <div style="display:flex;gap:8px;margin-top:4px;">
       <button class="btn btn-primary" onclick="submitRequest()">Submit request</button>
-      <button class="btn" onclick="showPage('list')">Cancel</button>
+      <button class="btn mgmt-only" id="form-cancel-btn" onclick="showPage('list')" style="display:none;">Cancel</button>
     </div>
+  </div>
+
+  <!-- Success screen shown to workers after submit -->
+  <div id="worker-success" class="card" style="display:none;text-align:center;padding:2.5rem 1.5rem;">
+    <div style="font-size:42px;margin-bottom:12px;">✅</div>
+    <div style="font-size:17px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px;">Request submitted!</div>
+    <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:20px;">Your supervisor will be notified. Thank you!</div>
+    <button class="btn btn-primary" onclick="workerNewRequest()">Submit another request</button>
   </div>
 </div>
 
-<!-- ANALYTICS PAGE -->
+<!-- ANALYTICS PAGE (supervisor only) -->
 <div id="page-analytics" style="display:none;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
     <div style="font-size:15px;font-weight:500;color:var(--color-text-primary);">Analytics dashboard</div>
@@ -158,6 +214,8 @@
 
 <div class="toast" id="toast"></div>
 </div>
+</div>
+
 <script type="module" src="assets/js/app.js"></script>
 </body>
 </html>

@@ -12,8 +12,7 @@ function renderAnalytics() {
     <div class="metric"><div class="metric-label">Fulfilled</div><div class="metric-val">${done}</div><div class="metric-sub">${total?Math.round(done/total*100):0}% completion</div></div>
     <div class="metric"><div class="metric-label">Urgent flagged</div><div class="metric-val">${urgent}</div></div>
     <div class="metric"><div class="metric-label">Job sites</div><div class="metric-val">${sites}</div></div>
-    <div class="metric"><div class="metric-label">Est. total cost</div><div class="metric-val">$${spend.toFixed(0)}</div><div class="metric-sub">where cost entered</div></div>
-  `;
+     `;
 
   const byKey = (key) => {
     const map = {};

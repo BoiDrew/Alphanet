@@ -1,34 +1,64 @@
-const SK = 'cleaning_requests_v2';
+// Import modules
+
+import {
+loadRequests,
+saveRequests
+}
+
+from "./storage.js";
+
+import {
+toast
+}
+
+from "./ui.js";
+
+import {
+renderAnalytics
+}
+
+from "./analytics.js";
+
+/* State */
+
 let requests = [];
 let currentTab = 'pending';
 let currentPage = 'list';
 
+/* Init */
+
+async function init() {
+  requests =await loadRequests();
+  rebuildFilters();
+  render();
+}
 
 
-
-
+/* Navigation */
 function showPage(p) {
   currentPage = p;
   document.getElementById('page-list').style.display = p === 'list' ? '' : 'none';
   document.getElementById('page-new').style.display = p === 'new' ? '' : 'none';
   document.getElementById('page-analytics').style.display = p === 'analytics' ? '' : 'none';
   document.getElementById('main-nav').style.display = p === 'list' ? '' : 'none';
-  if (p === 'analytics') renderAnalytics();
-}
+  if (p === 'analytics') renderAnalytics(requests);
+};
 
-function gotoNew() {
+window.gotoNew = function() {
   rebuildSiteList();
   showPage('new');
 }
 
-function switchTab(t) {
+/* Tabs */
+window.switchTab = function(t) {
   currentTab = t;
   document.querySelectorAll('#main-nav .tab').forEach((el, i) => {
     el.classList.toggle('active', ['pending','urgent','ordered','done','all'][i] === t);
   });
   render();
-}
+};
 
+/* Filters */
 function rebuildSiteList() {
   const sites = [...new Set(requests.map(r => r.site).filter(Boolean))];
   const dl = document.getElementById('site-list');
@@ -46,7 +76,10 @@ function rebuildFilters() {
   fc.innerHTML = '<option value="">All categories</option>' + cats.map(c => `<option${curCat===c?' selected':''}>${escHtml(c)}</option>`).join('');
 }
 
-function submitRequest() {
+
+
+/* Submit */
+window.submitRequest = function() {
   const name = document.getElementById('f-name').value.trim();
   const site = document.getElementById('f-site').value.trim();
   const product = document.getElementById('f-product').value.trim();
@@ -66,27 +99,16 @@ function submitRequest() {
     date: new Date().toLocaleDateString('en-GB'),
     ts: Date.now()
   });
-  save();
-  ['f-name','f-site','f-product','f-qty','f-cost','f-supplier','f-notes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('f-priority').value = 'normal';
-  document.getElementById('f-cat').value = 'Cleaning chemicals';
-  document.getElementById('f-freq').value = 'one-off';
-  currentTab = document.getElementById('f-priority').value === 'urgent' ? 'urgent' : 'pending';
+  saveRequests(requests);
   rebuildFilters();
   showPage('list');
   render();
   toast('Request submitted!');
-}
+};
 
-function setStatus(id, status) {
-  const r = requests.find(x => x.id === id);
-  if (r) { r.status = status; save(); render(); toast('Updated!'); }
-}
+/* Rendering */
 
-function deleteReq(id) {
-  requests = requests.filter(x => x.id !== id);
-  save(); rebuildFilters(); render(); toast('Removed.');
-}
+
 
 function filtered() {
   const site = document.getElementById('filter-site').value;
@@ -155,8 +177,8 @@ function render() {
 
 
 function exportCSV() {
-  const headers = ['Date','Worker','Job site','Product','Category','Qty','Priority','Status','Unit cost','Supplier','Frequency','Notes'];
-  const rows = requests.map(r => [r.date,r.name,r.site||'',r.product,r.category||'',r.qty||'',r.priority,r.status,r.cost!=null?r.cost.toFixed(2):'',r.supplier||'',r.frequency||'',r.notes||''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+  const headers = ['Date','Worker','Job site','Product','Category','Priority','Status','Unit cost','Supplier','Frequency','Notes'];
+  const rows = requests.map(r => [r.date,r.name,r.site||'',r.product,r.category||'',r.priority,r.status,r.cost!=null?r.cost.toFixed(2):'',r.supplier||'',r.frequency||'',r.notes||''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
   const csv = [headers.join(','), ...rows].join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
@@ -168,4 +190,5 @@ function escHtml(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-load();
+
+;

@@ -1,5 +1,11 @@
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:var(--font-sans);}
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:var(--font-sans);}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
 .wrap{padding:1rem 0;}
 .nav{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap;}

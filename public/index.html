@@ -22,11 +22,14 @@
     <div style="font-size:18px;font-weight:500;color:var(--color-text-primary);">Supply request tracker</div>
     <div style="font-size:13px;color:var(--color-text-secondary);margin-top:2px;">Products, materials &amp; analytics</div>
   </div>
+
   <div style="display:flex;gap:8px;">
     <button class="btn btn-primary" onclick="gotoNew()">+ New request</button>
     <button class="btn" onclick="showPage('analytics')">Analytics</button>
   </div>
 </div>
+
+<!-- Navigation -->
 
 <div class="nav" id="main-nav">
   <button class="tab active" onclick="switchTab('pending')">Pending <span class="cnt" id="cnt-pending">0</span></button>
@@ -36,6 +39,8 @@
   <button class="tab" onclick="switchTab('all')">All <span class="cnt" id="cnt-all">0</span></button>
 </div>
 
+
+<!-- Pages -->
 <div id="page-list">
   <div class="filter-row">
     <select id="filter-site" onchange="render()"><option value="">All job sites</option></select>
@@ -45,7 +50,9 @@
   <div id="list-body"></div>
 </div>
 
+<!-- NEW PAGE -->
 <div id="page-new" style="display:none;">
+
   <div class="card">
     <div style="font-size:15px;font-weight:500;margin-bottom:1rem;color:var(--color-text-primary);">New supply request</div>
     <div class="grid2">
@@ -120,6 +127,7 @@
   </div>
 </div>
 
+<!-- analytics -->
 <div id="page-analytics" style="display:none;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
     <div style="font-size:15px;font-weight:500;color:var(--color-text-primary);">Analytics dashboard</div>
@@ -161,11 +169,12 @@
 <div class="toast" id="toast"></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="assets/js/app.js"></script>
-<script src="assets/js/analysis.js"></script>
-<script src="assets/js/storage.js"></script>
-<script src="assets/js/ui.js"></script>
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
+<script src="assets/js/app.js" defer></script>
+<script src="assets/js/analysis.js" defer></script>
+<script src="assets/js/storage.js" defer></script>
+<script src="assets/js/ui.js" defer></script>
 
 </body>
 </html>

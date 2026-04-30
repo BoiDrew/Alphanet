@@ -21,7 +21,7 @@ A browser-based supply request and analytics system for cleaning teams.
 
 ## Live Demo
 
-alphanet-eta.vercel.app
+[alphanet-eta.vercel.app](https://alphanet-eta.vercel.app/)
 
 ## Screenshots
 

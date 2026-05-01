@@ -3,92 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Supply Request Tracker</title>
+  <title>Suivi des demandes de fournitures</title>
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-
 <body>
-<button class="lang-toggle" onclick="toggleLang()">
-    🇫🇷 FR
-</button>
 
-<!-- ══════════════════════════════════════════
-     ROLE GATE — shown before anything else
-     ══════════════════════════════════════════ -->
+<!-- ══════════════════════════ ROLE GATE ══════════════════════════ -->
 <div id="gate" class="gate-wrap">
   <div class="gate-card">
-    <div class="gate-logo"></div>
-    <div class="gate-title">Supply Request Tracker</div>
-    <div class="gate-sub">Who are you signing in as?</div>
+    <!-- Language toggle sits in gate too -->
+    <div style="text-align:right;margin-bottom:0.5rem;">
+      <button class="lang-toggle btn btn-sm" onclick="toggleLang()">🇬🇧 EN</button>
+    </div>
+
+    <div class="gate-logo">🧹</div>
+    <div class="gate-title" id="gate-title">Suivi des demandes de fournitures</div>
+    <div class="gate-sub" id="gate-sub-text">Qui êtes-vous ?</div>
 
     <div class="gate-btns">
       <button class="gate-btn" onclick="selectRole('worker')">
         <span class="gate-btn-icon">👷</span>
-        <span class="gate-btn-label">Worker</span>
-        <span class="gate-btn-desc">Submit a new supply request</span>
+        <span class="gate-btn-label" id="gate-worker-label">Agent</span>
+        <span class="gate-btn-desc" id="gate-worker-desc">Soumettre une demande de fournitures</span>
       </button>
       <button class="gate-btn" onclick="selectRole('supervisor')">
         <span class="gate-btn-icon">📋</span>
-        <span class="gate-btn-label">Supervisor</span>
-        <span class="gate-btn-desc">Manage requests &amp; analytics</span>
+        <span class="gate-btn-label" id="gate-super-label">Superviseur</span>
+        <span class="gate-btn-desc" id="gate-super-desc">Gérer les demandes et les analyses</span>
       </button>
     </div>
 
-    <!-- PIN prompt -->
     <div id="gate-pin-wrap" style="display:none;margin-top:1.25rem;">
       <div class="form-row" style="margin-bottom:8px;">
-        <label style="text-align:center;display:block;margin-bottom:6px;">Enter supervisor PIN</label>
+        <label id="gate-pin-label" style="text-align:center;display:block;margin-bottom:6px;">Entrez le code superviseur</label>
         <input id="gate-pin" type="password" inputmode="numeric" maxlength="8"
                placeholder="••••" style="text-align:center;letter-spacing:4px;font-size:18px;"
                onkeydown="if(event.key==='Enter')confirmPin()">
       </div>
       <div style="display:flex;gap:8px;justify-content:center;">
-        <button class="btn btn-primary" onclick="confirmPin()">Enter</button>
-        <button class="btn" onclick="cancelPin()">Back</button>
+        <button class="btn btn-primary" id="gate-pin-enter" onclick="confirmPin()">Valider</button>
+        <button class="btn" id="gate-pin-back" onclick="cancelPin()">Retour</button>
       </div>
       <div id="gate-pin-error" style="color:#A32D2D;font-size:12px;text-align:center;margin-top:8px;display:none;">
-        Incorrect PIN. Try again.
+        Code incorrect. Réessayez.
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     MAIN APP — hidden until role is set
-     ══════════════════════════════════════════ -->
+<!-- ══════════════════════════ MAIN APP ══════════════════════════ -->
 <div id="app" style="display:none;">
 <div class="wrap" style="position:relative;">
-<h2 class="sr-only">Cleaning company supply request tracker</h2>
+<h2 class="sr-only">Suivi des demandes de fournitures</h2>
 
 <!-- HEADER -->
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px;">
   <div>
-    <div style="font-size:18px;font-weight:500;color:var(--color-text-primary);">Supply request tracker</div>
-    <div style="font-size:13px;color:var(--color-text-secondary);margin-top:2px;" id="header-sub">Products, materials &amp; analytics</div>
+    <div id="app-title" style="font-size:18px;font-weight:500;color:var(--color-text-primary);">Suivi des demandes</div>
+    <div id="header-sub" style="font-size:13px;color:var(--color-text-secondary);margin-top:2px;">Produits, matériaux et analyses</div>
   </div>
-  <div style="display:flex;gap:8px;align-items:center;">
-    <button class="btn btn-primary mgmt-only" onclick="gotoNew()" style="display:none;">+ New request</button>
-    <button class="btn mgmt-only" onclick="showPage('analytics')" style="display:none;">Analytics</button>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+    <button class="btn btn-primary mgmt-only" id="btn-new-request" onclick="gotoNew()" style="display:none;">+ Nouvelle demande</button>
+    <button class="btn mgmt-only" id="btn-analytics" onclick="showPage('analytics')" style="display:none;">Analyses</button>
     <span id="role-pill" class="badge" style="font-size:11px;"></span>
-    <button class="btn btn-sm" onclick="signOut()">Sign out</button>
+    <button class="lang-toggle btn btn-sm" onclick="toggleLang()">🇬🇧 EN</button>
+    <button class="btn btn-sm" id="sign-out-btn" onclick="signOut()">Déconnexion</button>
   </div>
 </div>
 
-<!-- Navigation (supervisor only) -->
+<!-- NAV TABS (supervisor only) -->
 <div class="nav mgmt-only" id="main-nav" style="display:none;">
-  <button class="tab active" onclick="switchTab('pending')">Pending <span class="cnt" id="cnt-pending">0</span></button>
-  <button class="tab" onclick="switchTab('urgent')">Urgent <span class="cnt" id="cnt-urgent">0</span></button>
-  <button class="tab" onclick="switchTab('ordered')">Ordered <span class="cnt" id="cnt-ordered">0</span></button>
-  <button class="tab" onclick="switchTab('done')">Done <span class="cnt" id="cnt-done">0</span></button>
-  <button class="tab" onclick="switchTab('all')">All <span class="cnt" id="cnt-all">0</span></button>
+  <button class="tab active" id="tab-pending" onclick="switchTab('pending')">En attente <span class="cnt" id="cnt-pending">0</span></button>
+  <button class="tab" id="tab-urgent"  onclick="switchTab('urgent')">Urgent <span class="cnt" id="cnt-urgent">0</span></button>
+  <button class="tab" id="tab-ordered" onclick="switchTab('ordered')">Commandé <span class="cnt" id="cnt-ordered">0</span></button>
+  <button class="tab" id="tab-done"    onclick="switchTab('done')">Terminé <span class="cnt" id="cnt-done">0</span></button>
+  <button class="tab" id="tab-all"     onclick="switchTab('all')">Tout <span class="cnt" id="cnt-all">0</span></button>
 </div>
 
-<!-- LIST PAGE (supervisor only) -->
+<!-- LIST PAGE -->
 <div id="page-list" style="display:none;">
   <div class="filter-row">
-    <select id="filter-site" onchange="render()"><option value="">All job sites</option></select>
-    <select id="filter-cat" onchange="render()"><option value="">All categories</option></select>
-    <input type="text" id="filter-search" placeholder="Search requests..." oninput="render()" style="flex:1;min-width:120px;">
+    <select id="filter-site" onchange="render()"><option value="">Tous les chantiers</option></select>
+    <select id="filter-cat"  onchange="render()"><option value="">Toutes les catégories</option></select>
+    <input type="text" id="filter-search" placeholder="Rechercher des demandes…" oninput="render()" style="flex:1;min-width:120px;">
   </div>
   <div id="list-body"></div>
 </div>
@@ -96,122 +93,128 @@
 <!-- NEW REQUEST PAGE -->
 <div id="page-new" style="display:none;">
   <div id="form-card" class="card">
-    <div style="font-size:15px;font-weight:500;margin-bottom:1rem;color:var(--color-text-primary);">New supply request</div>
+    <div id="form-title" style="font-size:15px;font-weight:500;margin-bottom:1rem;color:var(--color-text-primary);">Nouvelle demande de fournitures</div>
+
     <div class="grid2">
       <div class="form-row">
-        <label>Your name *</label>
-        <input id="f-name" type="text" placeholder="e.g. Maria">
+        <label id="label-name">Votre nom *</label>
+        <input id="f-name" type="text" placeholder="ex. Marie">
       </div>
       <div class="form-row">
-        <label>Job site *</label>
-        <input id="f-site" type="text" placeholder="e.g. Riverside Offices, Block A" list="site-list">
+        <label id="label-site">Chantier *</label>
+        <input id="f-site" type="text" placeholder="ex. Bureau Central, Bloc A" list="site-list">
         <datalist id="site-list"></datalist>
       </div>
     </div>
+
     <div class="grid2">
       <div class="form-row">
-        <label>Product / material *</label>
-        <input id="f-product" type="text" placeholder="e.g. Bleach spray, mop heads">
+        <label id="label-product">Produit / matériel *</label>
+        <input id="f-product" type="text" placeholder="ex. Spray javel, têtes de balai">
       </div>
       <div class="form-row">
-        <label>Category</label>
+        <label id="label-category">Catégorie</label>
         <select id="f-cat">
-          <option value="Cleaning chemicals">Cleaning chemicals</option>
-          <option value="Equipment">Equipment</option>
-          <option value="Disposables">Disposables</option>
-          <option value="PPE">PPE / Safety</option>
-          <option value="Paper products">Paper products</option>
-          <option value="Tools">Tools</option>
-          <option value="Other">Other</option>
+          <option value="Cleaning chemicals">Produits chimiques</option>
+          <option value="Equipment">Équipement</option>
+          <option value="Disposables">Consommables</option>
+          <option value="PPE">EPI / Sécurité</option>
+          <option value="Paper products">Produits en papier</option>
+          <option value="Tools">Outils</option>
+          <option value="Other">Autre</option>
         </select>
       </div>
     </div>
+
     <div class="grid3">
       <div class="form-row">
-        <label>Quantity needed</label>
-        <input id="f-qty" type="text" placeholder="e.g. 2 boxes">
+        <label id="label-qty">Quantité nécessaire</label>
+        <input id="f-qty" type="text" placeholder="ex. 2 boîtes">
       </div>
       <div class="form-row">
-        <label>Est. unit cost ($)</label>
-        <input id="f-cost" type="number" step="0.01" min="0" placeholder="e.g. 4.50">
+        <label id="label-cost">Coût unitaire estimé (€)</label>
+        <input id="f-cost" type="number" step="0.01" min="0" placeholder="ex. 4,50">
       </div>
       <div class="form-row">
-        <label>Priority</label>
+        <label id="label-priority">Priorité</label>
         <select id="f-priority">
           <option value="normal">Normal</option>
           <option value="urgent">Urgent</option>
         </select>
       </div>
     </div>
+
     <div class="grid2">
       <div class="form-row">
-        <label>Frequency of need</label>
+        <label id="label-freq">Fréquence du besoin</label>
         <select id="f-freq">
-          <option value="one-off">One-off</option>
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
-          <option value="as needed">As needed</option>
+          <option value="one-off">Ponctuel</option>
+          <option value="weekly">Hebdomadaire</option>
+          <option value="monthly">Mensuel</option>
+          <option value="as needed">Selon les besoins</option>
         </select>
       </div>
       <div class="form-row">
-        <label>Preferred supplier</label>
-        <input id="f-supplier" type="text" placeholder="e.g. CleanCo, Amazon">
+        <label id="label-supplier">Fournisseur préféré</label>
+        <input id="f-supplier" type="text" placeholder="ex. CleanCo, Amazon">
       </div>
     </div>
+
     <div class="form-row">
-      <label>Reason / notes</label>
-      <textarea id="f-notes" placeholder="Why is it needed? Running low, damaged item, etc."></textarea>
+      <label id="label-notes">Raison / remarques</label>
+      <textarea id="f-notes" placeholder="Pourquoi en avez-vous besoin ? Stock bas, article endommagé…"></textarea>
     </div>
+
     <div style="display:flex;gap:8px;margin-top:4px;">
-      <button class="btn btn-primary" onclick="submitRequest()">Submit request</button>
-      <button class="btn mgmt-only" id="form-cancel-btn" onclick="showPage('list')" style="display:none;">Cancel</button>
+      <button class="btn btn-primary" id="btn-submit" onclick="submitRequest()">Soumettre la demande</button>
+      <button class="btn mgmt-only" id="btn-cancel" onclick="showPage('list')" style="display:none;">Annuler</button>
     </div>
   </div>
 
-  <!-- Success screen shown to workers after submit -->
+  <!-- Worker success screen -->
   <div id="worker-success" class="card" style="display:none;text-align:center;padding:2.5rem 1.5rem;">
     <div style="font-size:42px;margin-bottom:12px;">✅</div>
-    <div style="font-size:17px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px;">Request submitted!</div>
-    <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:20px;">Your supervisor will be notified. Thank you!</div>
-    <button class="btn btn-primary" onclick="workerNewRequest()">Submit another request</button>
+    <div id="success-title" style="font-size:17px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px;">Demande envoyée !</div>
+    <div id="success-msg" style="font-size:13px;color:var(--color-text-secondary);margin-bottom:20px;">Votre superviseur sera notifié. Merci !</div>
+    <button class="btn btn-primary" id="btn-another" onclick="workerNewRequest()">Soumettre une autre demande</button>
   </div>
 </div>
 
 <!-- ANALYTICS PAGE (supervisor only) -->
 <div id="page-analytics" style="display:none;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-    <div style="font-size:15px;font-weight:500;color:var(--color-text-primary);">Analytics dashboard</div>
-    <button class="btn btn-sm" onclick="showPage('list')">Back to requests</button>
+    <div id="analytics-title" style="font-size:15px;font-weight:500;color:var(--color-text-primary);">Tableau de bord analytique</div>
+    <button class="btn btn-sm" id="btn-back-requests" onclick="showPage('list')">Retour aux demandes</button>
   </div>
   <div class="metric-grid" id="kpi-row"></div>
   <div class="grid2" style="gap:16px;margin-bottom:1rem;">
     <div class="card">
-      <div class="section-hd">Requests by job site</div>
+      <div class="section-hd" id="chart-site-hd">Demandes par chantier</div>
       <div id="chart-site"></div>
     </div>
     <div class="card">
-      <div class="section-hd">Requests by category</div>
+      <div class="section-hd" id="chart-cat-hd">Demandes par catégorie</div>
       <div id="chart-cat"></div>
     </div>
   </div>
   <div class="card" style="margin-bottom:1rem;">
-    <div class="section-hd">Top requested products</div>
+    <div class="section-hd" id="chart-products-hd">Produits les plus demandés</div>
     <div id="chart-products"></div>
   </div>
   <div class="card" style="margin-bottom:1rem;">
-    <div class="section-hd">Most active requesters</div>
+    <div class="section-hd" id="chart-workers-hd">Agents les plus actifs</div>
     <div id="chart-workers"></div>
   </div>
   <div class="card" style="margin-bottom:1rem;">
-    <div class="section-hd">Estimated spend by category</div>
+    <div class="section-hd" id="chart-spend-hd">Dépense estimée par catégorie</div>
     <div id="chart-spend"></div>
   </div>
   <div class="card">
-    <div class="section-hd">Request log (exportable)</div>
+    <div class="section-hd" id="export-title">Journal des demandes (exportable)</div>
     <div style="overflow-x:auto;">
       <table class="data-table" id="export-table"></table>
     </div>
-    <button class="btn btn-sm" style="margin-top:12px;" onclick="exportCSV()">Download CSV</button>
+    <button class="btn btn-sm" id="btn-download-csv" style="margin-top:12px;" onclick="exportCSV()">Télécharger CSV</button>
   </div>
 </div>
 

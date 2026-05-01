@@ -1,276 +1,146 @@
 /* ══════════════════════════════════════════
-   TRANSLATIONS  —  translations.js
-   Add keys here; use t('key') anywhere in the app.
+   translations.js
+   All UI strings in EN and FR.
    ══════════════════════════════════════════ */
 
-export const LANGS = {
+const strings = {
 
-  en: {
-    /* Gate */
-    gateTitle:        "Supply Request Tracker",
-    gateSub:          "Who are you signing in as?",
-    gateWorkerLabel:  "Worker",
-    gateWorkerDesc:   "Submit a new supply request",
-    gateSuperLabel:   "Supervisor",
-    gateSuperDesc:    "Manage requests & analytics",
-    gatePinPrompt:    "Enter supervisor PIN",
-    gatePinSubtitle:  "Supervisor access",
-    gatePinEnter:     "Enter",
-    gatePinBack:      "Back",
-    gatePinError:     "Incorrect PIN. Try again.",
+  /* ── Gate ── */
+  gateTitle:        { en: "Supply Request Tracker",          fr: "Suivi des demandes de fournitures" },
+  gateSub:          { en: "Who are you signing in as?",      fr: "Qui êtes-vous ?" },
+  gatePinSubtitle:  { en: "Supervisor access",               fr: "Accès superviseur" },
+  gateWorkerLabel:  { en: "Worker",                          fr: "Agent" },
+  gateWorkerDesc:   { en: "Submit a new supply request",     fr: "Soumettre une demande de fournitures" },
+  gateSuperLabel:   { en: "Supervisor",                      fr: "Superviseur" },
+  gateSuperDesc:    { en: "Manage requests & analytics",     fr: "Gérer les demandes et les analyses" },
+  gatePinPrompt:    { en: "Enter supervisor PIN",            fr: "Entrez le code superviseur" },
+  gatePinEnter:     { en: "Enter",                           fr: "Valider" },
+  gatePinBack:      { en: "Back",                            fr: "Retour" },
+  gatePinError:     { en: "Incorrect PIN. Try again.",       fr: "Code incorrect. Réessayez." },
 
-    /* Header */
-    appTitle:         "Supply Request Tracker",
-    headerSubMgmt:    "Products, materials & analytics",
-    headerSubWorker:  "Submit a supply request",
-    rolePillWorker:   "Worker",
-    rolePillSuper:    "Supervisor",
-    signOut:          "Sign out",
+  /* ── Header ── */
+  appTitle:         { en: "Supply Request Tracker",          fr: "Suivi des demandes de fournitures" },
+  headerSubMgmt:    { en: "Products, materials & analytics", fr: "Produits, matériaux et analyses" },
+  headerSubWorker:  { en: "Submit a supply request",         fr: "Soumettre une demande de fournitures" },
+  signOut:          { en: "Sign out",                        fr: "Déconnexion" },
+  rolePillWorker:   { en: "Worker",                          fr: "Agent" },
+  rolePillSuper:    { en: "Supervisor",                      fr: "Superviseur" },
+  btnNewRequest:    { en: "+ New request",                   fr: "+ Nouvelle demande" },
+  btnAnalytics:     { en: "Analytics",                       fr: "Analyses" },
 
-    /* Nav tabs */
-    tabPending:       "Pending",
-    tabUrgent:        "Urgent",
-    tabOrdered:       "Ordered",
-    tabDone:          "Done",
-    tabAll:           "All",
+  /* ── Nav tabs ── */
+  tabPending:       { en: "Pending",                         fr: "En attente" },
+  tabUrgent:        { en: "Urgent",                          fr: "Urgent" },
+  tabOrdered:       { en: "Ordered",                         fr: "Commandé" },
+  tabDone:          { en: "Done",                            fr: "Terminé" },
+  tabAll:           { en: "All",                             fr: "Tout" },
 
-    /* Filters */
-    filterAllSites:   "All job sites",
-    filterAllCats:    "All categories",
-    filterSearch:     "Search requests...",
+  /* ── Filters ── */
+  filterAllSites:   { en: "All job sites",                   fr: "Tous les chantiers" },
+  filterAllCats:    { en: "All categories",                  fr: "Toutes les catégories" },
+  filterSearch:     { en: "Search requests…",               fr: "Rechercher des demandes…" },
 
-    /* New request form */
-    formTitle:        "New supply request",
-    fieldName:        "Your name *",
-    fieldNamePH:      "e.g. Maria",
-    fieldSite:        "Job site *",
-    fieldSitePH:      "e.g. Riverside Offices, Block A",
-    fieldProduct:     "Product / material *",
-    fieldProductPH:   "e.g. Bleach spray, mop heads",
-    fieldCategory:    "Category",
-    fieldQty:         "Quantity needed",
-    fieldQtyPH:       "e.g. 2 boxes",
-    fieldCost:        "Est. unit cost ($)",
-    fieldCostPH:      "e.g. 4.50",
-    fieldPriority:    "Priority",
-    priorityNormal:   "Normal",
-    priorityUrgent:   "Urgent",
-    fieldFreq:        "Frequency of need",
-    freqOneOff:       "One-off",
-    freqWeekly:       "Weekly",
-    freqMonthly:      "Monthly",
-    freqAsNeeded:     "As needed",
-    fieldSupplier:    "Preferred supplier",
-    fieldSupplierPH:  "e.g. CleanCo, Amazon",
-    fieldNotes:       "Reason / notes",
-    fieldNotesPH:     "Why is it needed? Running low, damaged item, etc.",
-    btnSubmit:        "Submit request",
-    btnCancel:        "Cancel",
+  /* ── Form ── */
+  formTitle:        { en: "New supply request",              fr: "Nouvelle demande de fournitures" },
+  fieldName:        { en: "Your name *",                     fr: "Votre nom *" },
+  fieldNamePH:      { en: "e.g. Maria",                      fr: "ex. Marie" },
+  fieldSite:        { en: "Job site *",                      fr: "Chantier *" },
+  fieldSitePH:      { en: "e.g. Riverside Offices, Block A", fr: "ex. Bureau Central, Bloc A" },
+  fieldProduct:     { en: "Product / material *",            fr: "Produit / matériel *" },
+  fieldProductPH:   { en: "e.g. Bleach spray, mop heads",    fr: "ex. Spray javel, têtes de balai" },
+  fieldCategory:    { en: "Category",                        fr: "Catégorie" },
+  fieldQty:         { en: "Quantity needed",                 fr: "Quantité nécessaire" },
+  fieldQtyPH:       { en: "e.g. 2 boxes",                    fr: "ex. 2 boîtes" },
+  fieldCost:        { en: "Est. unit cost ($)",              fr: "Coût unitaire estimé (€)" },
+  fieldCostPH:      { en: "e.g. 4.50",                       fr: "ex. 4,50" },
+  fieldPriority:    { en: "Priority",                        fr: "Priorité" },
+  fieldFreq:        { en: "Frequency of need",               fr: "Fréquence du besoin" },
+  fieldSupplier:    { en: "Preferred supplier",              fr: "Fournisseur préféré" },
+  fieldSupplierPH:  { en: "e.g. CleanCo, Amazon",            fr: "ex. CleanCo, Amazon" },
+  fieldNotes:       { en: "Reason / notes",                  fr: "Raison / remarques" },
+  fieldNotesPH:     { en: "Why is it needed? Running low, damaged item…", fr: "Pourquoi en avez-vous besoin ? Stock bas, article endommagé…" },
+  btnSubmit:        { en: "Submit request",                  fr: "Soumettre la demande" },
+  btnCancel:        { en: "Cancel",                          fr: "Annuler" },
 
-    /* Categories */
-    catChemicals:     "Cleaning chemicals",
-    catEquipment:     "Equipment",
-    catDisposables:   "Disposables",
-    catPPE:           "PPE / Safety",
-    catPaper:         "Paper products",
-    catTools:         "Tools",
-    catOther:         "Other",
+  /* ── Category options ── */
+  catChemicals:     { en: "Cleaning chemicals",              fr: "Produits chimiques" },
+  catEquipment:     { en: "Equipment",                       fr: "Équipement" },
+  catDisposables:   { en: "Disposables",                     fr: "Consommables" },
+  catPPE:           { en: "PPE / Safety",                    fr: "EPI / Sécurité" },
+  catPaper:         { en: "Paper products",                  fr: "Produits en papier" },
+  catTools:         { en: "Tools",                           fr: "Outils" },
+  catOther:         { en: "Other",                           fr: "Autre" },
 
-    /* Worker success */
-    successTitle:     "Request submitted!",
-    successMsg:       "Your supervisor will be notified. Thank you!",
-    btnAnother:       "Submit another request",
+  /* ── Priority options ── */
+  priorityNormal:   { en: "Normal",                          fr: "Normal" },
+  priorityUrgent:   { en: "Urgent",                          fr: "Urgent" },
 
-    /* Request card */
-    cardBy:           "By",
-    cardSupplier:     "Supplier",
-    btnMarkOrdered:   "Mark ordered",
-    btnMarkDone:      "Mark done",
-    btnReopen:        "Reopen",
-    btnRemove:        "Remove",
+  /* ── Frequency options ── */
+  freqOneOff:       { en: "One-off",                         fr: "Ponctuel" },
+  freqWeekly:       { en: "Weekly",                          fr: "Hebdomadaire" },
+  freqMonthly:      { en: "Monthly",                         fr: "Mensuel" },
+  freqAsNeeded:     { en: "As needed",                       fr: "Selon les besoins" },
 
-    /* Status labels */
-    statusPending:    "Pending",
-    statusOrdered:    "Ordered",
-    statusUrgent:     "Urgent",
-    statusDone:       "Done",
+  /* ── Worker success screen ── */
+  successTitle:     { en: "Request submitted!",              fr: "Demande envoyée !" },
+  successMsg:       { en: "Your supervisor will be notified. Thank you!", fr: "Votre superviseur sera notifié. Merci !" },
+  btnAnother:       { en: "Submit another request",          fr: "Soumettre une autre demande" },
 
-    /* Toasts */
-    toastSubmitted:   "Request submitted!",
-    toastUpdated:     "Updated!",
-    toastRemoved:     "Removed.",
-    toastRequired:    "Name, job site and product are required.",
-    confirmRemove:    "Remove this request?",
+  /* ── Request card ── */
+  cardBy:           { en: "By",                              fr: "Par" },
+  cardSupplier:     { en: "Supplier",                        fr: "Fournisseur" },
+  statusPending:    { en: "Pending",                         fr: "En attente" },
+  statusUrgent:     { en: "Urgent",                          fr: "Urgent" },
+  statusOrdered:    { en: "Ordered",                         fr: "Commandé" },
+  statusDone:       { en: "Done",                            fr: "Terminé" },
+  btnMarkOrdered:   { en: "Mark ordered",                    fr: "Marquer commandé" },
+  btnMarkDone:      { en: "Mark done",                       fr: "Marquer terminé" },
+  btnReopen:        { en: "Reopen",                          fr: "Rouvrir" },
+  btnRemove:        { en: "Remove",                          fr: "Supprimer" },
+  noRequests:       { en: "No requests here yet.",           fr: "Aucune demande ici pour l'instant." },
 
-    /* Analytics */
-    analyticsTitle:       "Analytics dashboard",
-    btnBackToRequests:    "Back to requests",
-    kpiTotal:             "Total requests",
-    kpiPending:           "Pending",
-    kpiFulfilled:         "Fulfilled",
-    kpiCompletion:        "% completion",
-    kpiUrgent:            "Urgent flagged",
-    kpiSpend:             "Est. total spend",
-    kpiSites:             "Job sites",
-    chartBySite:          "Requests by job site",
-    chartByCat:           "Requests by category",
-    chartTopProducts:     "Top requested products",
-    chartWorkers:         "Most active requesters",
-    chartSpend:           "Estimated spend by category",
-    exportTitle:          "Request log (exportable)",
-    btnDownloadCSV:       "Download CSV",
-    noData:               "No data yet.",
-    noRequests:           "No requests here yet.",
+  /* ── Toasts ── */
+  toastRequired:    { en: "Name, job site and product are required.", fr: "Le nom, le chantier et le produit sont obligatoires." },
+  toastSubmitted:   { en: "Request submitted!",              fr: "Demande soumise !" },
+  toastUpdated:     { en: "Updated!",                        fr: "Mis à jour !" },
+  toastRemoved:     { en: "Removed.",                        fr: "Supprimé." },
+  confirmRemove:    { en: "Remove this request?",            fr: "Supprimer cette demande ?" },
 
-    /* Export table headers */
-    colDate:          "Date",
-    colWorker:        "Worker",
-    colSite:          "Job site",
-    colProduct:       "Product",
-    colCategory:      "Category",
-    colQty:           "Qty",
-    colPriority:      "Priority",
-    colStatus:        "Status",
-    colCost:          "Cost",
-    colSupplier:      "Supplier",
-    colFrequency:     "Frequency",
-    colNotes:         "Notes",
-  },
+  /* ── Analytics ── */
+  analyticsTitle:   { en: "Analytics dashboard",            fr: "Tableau de bord analytique" },
+  btnBackToRequests:{ en: "Back to requests",               fr: "Retour aux demandes" },
+  kpiTotal:         { en: "Total requests",                  fr: "Total des demandes" },
+  kpiPending:       { en: "Pending",                         fr: "En attente" },
+  kpiFulfilled:     { en: "Fulfilled",                       fr: "Satisfaites" },
+  kpiCompletion:    { en: "completion",                      fr: "complétées" },
+  kpiUrgent:        { en: "Urgent flagged",                  fr: "Urgentes signalées" },
+  kpiSpend:         { en: "Est. total spend",                fr: "Dépense totale estimée" },
+  kpiSites:         { en: "Job sites",                       fr: "Chantiers" },
+  chartBySite:      { en: "Requests by job site",            fr: "Demandes par chantier" },
+  chartByCat:       { en: "Requests by category",            fr: "Demandes par catégorie" },
+  chartTopProducts: { en: "Top requested products",          fr: "Produits les plus demandés" },
+  chartWorkers:     { en: "Most active requesters",          fr: "Agents les plus actifs" },
+  chartSpend:       { en: "Estimated spend by category",     fr: "Dépense estimée par catégorie" },
+  exportTitle:      { en: "Request log (exportable)",        fr: "Journal des demandes (exportable)" },
+  btnDownloadCSV:   { en: "Download CSV",                    fr: "Télécharger CSV" },
+  noData:           { en: "No data yet.",                    fr: "Aucune donnée pour l'instant." },
 
-  fr: {
-    /* Gate */
-    gateTitle:        "Suivi des demandes de fournitures",
-    gateSub:          "Qui êtes-vous ?",
-    gateWorkerLabel:  "Agent",
-    gateWorkerDesc:   "Soumettre une demande de fournitures",
-    gateSuperLabel:   "Responsable",
-    gateSuperDesc:    "Gérer les demandes et les analyses",
-    gatePinPrompt:    "Entrez le code PIN responsable",
-    gatePinSubtitle:  "Accès responsable",
-    gatePinEnter:     "Confirmer",
-    gatePinBack:      "Retour",
-    gatePinError:     "Code PIN incorrect. Réessayez.",
-
-    /* Header */
-    appTitle:         "Suivi des demandes de fournitures",
-    headerSubMgmt:    "Produits, matériaux & analyses",
-    headerSubWorker:  "Soumettre une demande de fournitures",
-    rolePillWorker:   "Agent",
-    rolePillSuper:    "Responsable",
-    signOut:          "Déconnexion",
-
-    /* Nav tabs */
-    tabPending:       "En attente",
-    tabUrgent:        "Urgent",
-    tabOrdered:       "Commandé",
-    tabDone:          "Terminé",
-    tabAll:           "Tout",
-
-    /* Filters */
-    filterAllSites:   "Tous les chantiers",
-    filterAllCats:    "Toutes les catégories",
-    filterSearch:     "Rechercher...",
-
-    /* New request form */
-    formTitle:        "Nouvelle demande de fournitures",
-    fieldName:        "Votre nom *",
-    fieldNamePH:      "ex. Maria",
-    fieldSite:        "Chantier *",
-    fieldSitePH:      "ex. Bureaux Riverside, Bâtiment A",
-    fieldProduct:     "Produit / matériau *",
-    fieldProductPH:   "ex. Spray javellisant, têtes de serpillière",
-    fieldCategory:    "Catégorie",
-    fieldQty:         "Quantité nécessaire",
-    fieldQtyPH:       "ex. 2 boîtes",
-    fieldCost:        "Coût unitaire estimé (€)",
-    fieldCostPH:      "ex. 4,50",
-    fieldPriority:    "Priorité",
-    priorityNormal:   "Normale",
-    priorityUrgent:   "Urgente",
-    fieldFreq:        "Fréquence du besoin",
-    freqOneOff:       "Ponctuel",
-    freqWeekly:       "Hebdomadaire",
-    freqMonthly:      "Mensuel",
-    freqAsNeeded:     "Selon les besoins",
-    fieldSupplier:    "Fournisseur préféré",
-    fieldSupplierPH:  "ex. CleanCo, Amazon",
-    fieldNotes:       "Motif / remarques",
-    fieldNotesPH:     "Pourquoi en avez-vous besoin ? Stock bas, article endommagé, etc.",
-    btnSubmit:        "Envoyer la demande",
-    btnCancel:        "Annuler",
-
-    /* Categories */
-    catChemicals:     "Produits d'entretien",
-    catEquipment:     "Équipement",
-    catDisposables:   "Consommables",
-    catPPE:           "EPI / Sécurité",
-    catPaper:         "Papeterie",
-    catTools:         "Outillage",
-    catOther:         "Autre",
-
-    /* Worker success */
-    successTitle:     "Demande envoyée !",
-    successMsg:       "Votre responsable en sera informé. Merci !",
-    btnAnother:       "Soumettre une autre demande",
-
-    /* Request card */
-    cardBy:           "Par",
-    cardSupplier:     "Fournisseur",
-    btnMarkOrdered:   "Marquer commandé",
-    btnMarkDone:      "Marquer terminé",
-    btnReopen:        "Rouvrir",
-    btnRemove:        "Supprimer",
-
-    /* Status labels */
-    statusPending:    "En attente",
-    statusOrdered:    "Commandé",
-    statusUrgent:     "Urgent",
-    statusDone:       "Terminé",
-
-    /* Toasts */
-    toastSubmitted:   "Demande envoyée !",
-    toastUpdated:     "Mis à jour !",
-    toastRemoved:     "Supprimé.",
-    toastRequired:    "Le nom, le chantier et le produit sont obligatoires.",
-    confirmRemove:    "Supprimer cette demande ?",
-
-    /* Analytics */
-    analyticsTitle:       "Tableau de bord analytique",
-    btnBackToRequests:    "Retour aux demandes",
-    kpiTotal:             "Total des demandes",
-    kpiPending:           "En attente",
-    kpiFulfilled:         "Traitées",
-    kpiCompletion:        "% de complétion",
-    kpiUrgent:            "Urgences signalées",
-    kpiSpend:             "Dépenses estimées",
-    kpiSites:             "Chantiers",
-    chartBySite:          "Demandes par chantier",
-    chartByCat:           "Demandes par catégorie",
-    chartTopProducts:     "Produits les plus demandés",
-    chartWorkers:         "Agents les plus actifs",
-    chartSpend:           "Dépenses estimées par catégorie",
-    exportTitle:          "Journal des demandes (exportable)",
-    btnDownloadCSV:       "Télécharger CSV",
-    noData:               "Aucune donnée.",
-    noRequests:           "Aucune demande pour l'instant.",
-
-    /* Export table headers */
-    colDate:          "Date",
-    colWorker:        "Agent",
-    colSite:          "Chantier",
-    colProduct:       "Produit",
-    colCategory:      "Catégorie",
-    colQty:           "Qté",
-    colPriority:      "Priorité",
-    colStatus:        "Statut",
-    colCost:          "Coût",
-    colSupplier:      "Fournisseur",
-    colFrequency:     "Fréquence",
-    colNotes:         "Remarques",
-  }
+  /* ── CSV column headers ── */
+  colDate:          { en: "Date",                            fr: "Date" },
+  colWorker:        { en: "Worker",                          fr: "Agent" },
+  colSite:          { en: "Job site",                        fr: "Chantier" },
+  colProduct:       { en: "Product",                         fr: "Produit" },
+  colCategory:      { en: "Category",                        fr: "Catégorie" },
+  colQty:           { en: "Qty",                             fr: "Qté" },
+  colPriority:      { en: "Priority",                        fr: "Priorité" },
+  colStatus:        { en: "Status",                          fr: "Statut" },
+  colCost:          { en: "Cost",                            fr: "Coût" },
+  colSupplier:      { en: "Supplier",                        fr: "Fournisseur" },
+  colFrequency:     { en: "Frequency",                       fr: "Fréquence" },
+  colNotes:         { en: "Notes",                           fr: "Remarques" },
 };
 
-/* Current language — persisted in localStorage */
+/* ── Active language (default: French) ── */
 export let currentLang = localStorage.getItem("srt_lang") || "fr";
 
 export function setLang(lang) {
@@ -278,9 +148,8 @@ export function setLang(lang) {
   localStorage.setItem("srt_lang", lang);
 }
 
-/* Translate helper */
 export function t(key) {
-  return (LANGS[currentLang] && LANGS[currentLang][key]) ||
-         (LANGS["en"] && LANGS["en"][key]) ||
-         key;
+  const entry = strings[key];
+  if (!entry) { console.warn("Missing translation key:", key); return key; }
+  return entry[currentLang] ?? entry.en ?? key;
 }

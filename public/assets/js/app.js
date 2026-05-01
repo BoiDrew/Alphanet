@@ -4,12 +4,12 @@ import { renderAnalytics } from "./analytics.js";
 import { t, setLang, currentLang } from "./translations.js";
 
 /* ══════════════════════════════════════════
-   CONFIGURATION — change PIN here
+   CONFIG — change PIN before deploying
    ══════════════════════════════════════════ */
-const SUPERVISOR_PIN = "1234"; // ← change before deploying
+const SUPERVISOR_PIN = "1234";
 
 /* ── State ── */
-let requests = [];
+let requests   = [];
 let currentTab = "pending";
 let currentRole = null; // "worker" | "supervisor"
 
@@ -17,17 +17,14 @@ let currentRole = null; // "worker" | "supervisor"
    LANGUAGE TOGGLE
    ══════════════════════════════════════════ */
 window.toggleLang = function () {
-  const next = currentLang === "fr" ? "en" : "fr";
-  setLang(next);
+  setLang(currentLang === "fr" ? "en" : "fr");
   applyTranslations();
 };
 
-/* Re-render all translatable text in the DOM without a full page reload */
 function applyTranslations() {
-  // Update html lang attribute
   document.documentElement.lang = currentLang;
 
-  // Toggle button label shows the OTHER language (what you'd switch TO)
+  // Button shows the language you'd SWITCH TO
   document.querySelectorAll(".lang-toggle").forEach(el => {
     el.textContent = currentLang === "fr" ? "🇬🇧 EN" : "🇫🇷 FR";
   });
@@ -45,18 +42,20 @@ function applyTranslations() {
   setTxt("gate-pin-error",   t("gatePinError"));
 
   /* Header */
-  setTxt("app-title",        t("appTitle"));
+  setTxt("app-title", t("appTitle"));
   if (currentRole === "supervisor") setTxt("header-sub", t("headerSubMgmt"));
   if (currentRole === "worker")     setTxt("header-sub", t("headerSubWorker"));
-  setTxt("sign-out-btn",     t("signOut"));
+  setTxt("sign-out-btn",    t("signOut"));
+  setTxt("btn-new-request", t("btnNewRequest"));
+  setTxt("btn-analytics",   t("btnAnalytics"));
   updateRolePill();
 
   /* Nav tabs */
-  setTxt("tab-pending",  t("tabPending"));
-  setTxt("tab-urgent",   t("tabUrgent"));
-  setTxt("tab-ordered",  t("tabOrdered"));
-  setTxt("tab-done",     t("tabDone"));
-  setTxt("tab-all",      t("tabAll"));
+  setTxt("tab-pending", t("tabPending"));
+  setTxt("tab-urgent",  t("tabUrgent"));
+  setTxt("tab-ordered", t("tabOrdered"));
+  setTxt("tab-done",    t("tabDone"));
+  setTxt("tab-all",     t("tabAll"));
 
   /* Filters */
   setFirstOption("filter-site", t("filterAllSites"));
@@ -64,28 +63,28 @@ function applyTranslations() {
   setAttr("filter-search", "placeholder", t("filterSearch"));
 
   /* Form */
-  setTxt("form-title",         t("formTitle"));
-  setTxt("label-name",         t("fieldName"));
-  setAttr("f-name",            "placeholder", t("fieldNamePH"));
-  setTxt("label-site",         t("fieldSite"));
-  setAttr("f-site",            "placeholder", t("fieldSitePH"));
-  setTxt("label-product",      t("fieldProduct"));
-  setAttr("f-product",         "placeholder", t("fieldProductPH"));
-  setTxt("label-category",     t("fieldCategory"));
-  setTxt("label-qty",          t("fieldQty"));
-  setAttr("f-qty",             "placeholder", t("fieldQtyPH"));
-  setTxt("label-cost",         t("fieldCost"));
-  setAttr("f-cost",            "placeholder", t("fieldCostPH"));
-  setTxt("label-priority",     t("fieldPriority"));
-  setTxt("label-freq",         t("fieldFreq"));
-  setTxt("label-supplier",     t("fieldSupplier"));
-  setAttr("f-supplier",        "placeholder", t("fieldSupplierPH"));
-  setTxt("label-notes",        t("fieldNotes"));
-  setAttr("f-notes",           "placeholder", t("fieldNotesPH"));
-  setTxt("btn-submit",         t("btnSubmit"));
-  setTxt("btn-cancel",         t("btnCancel"));
+  setTxt("form-title",      t("formTitle"));
+  setTxt("label-name",      t("fieldName"));
+  setAttr("f-name",         "placeholder", t("fieldNamePH"));
+  setTxt("label-site",      t("fieldSite"));
+  setAttr("f-site",         "placeholder", t("fieldSitePH"));
+  setTxt("label-product",   t("fieldProduct"));
+  setAttr("f-product",      "placeholder", t("fieldProductPH"));
+  setTxt("label-category",  t("fieldCategory"));
+  setTxt("label-qty",       t("fieldQty"));
+  setAttr("f-qty",          "placeholder", t("fieldQtyPH"));
+  setTxt("label-cost",      t("fieldCost"));
+  setAttr("f-cost",         "placeholder", t("fieldCostPH"));
+  setTxt("label-priority",  t("fieldPriority"));
+  setTxt("label-freq",      t("fieldFreq"));
+  setTxt("label-supplier",  t("fieldSupplier"));
+  setAttr("f-supplier",     "placeholder", t("fieldSupplierPH"));
+  setTxt("label-notes",     t("fieldNotes"));
+  setAttr("f-notes",        "placeholder", t("fieldNotesPH"));
+  setTxt("btn-submit",      t("btnSubmit"));
+  setTxt("btn-cancel",      t("btnCancel"));
 
-  /* Category options */
+  /* Select options */
   setOption("f-cat", "Cleaning chemicals", t("catChemicals"));
   setOption("f-cat", "Equipment",          t("catEquipment"));
   setOption("f-cat", "Disposables",        t("catDisposables"));
@@ -93,38 +92,35 @@ function applyTranslations() {
   setOption("f-cat", "Paper products",     t("catPaper"));
   setOption("f-cat", "Tools",              t("catTools"));
   setOption("f-cat", "Other",              t("catOther"));
-
-  /* Priority options */
-  setOption("f-priority", "normal",  t("priorityNormal"));
-  setOption("f-priority", "urgent",  t("priorityUrgent"));
-
-  /* Frequency options */
-  setOption("f-freq", "one-off",    t("freqOneOff"));
-  setOption("f-freq", "weekly",     t("freqWeekly"));
-  setOption("f-freq", "monthly",    t("freqMonthly"));
-  setOption("f-freq", "as needed",  t("freqAsNeeded"));
+  setOption("f-priority", "normal",        t("priorityNormal"));
+  setOption("f-priority", "urgent",        t("priorityUrgent"));
+  setOption("f-freq", "one-off",           t("freqOneOff"));
+  setOption("f-freq", "weekly",            t("freqWeekly"));
+  setOption("f-freq", "monthly",           t("freqMonthly"));
+  setOption("f-freq", "as needed",         t("freqAsNeeded"));
 
   /* Worker success */
-  setTxt("success-title",  t("successTitle"));
-  setTxt("success-msg",    t("successMsg"));
-  setTxt("btn-another",    t("btnAnother"));
+  setTxt("success-title", t("successTitle"));
+  setTxt("success-msg",   t("successMsg"));
+  setTxt("btn-another",   t("btnAnother"));
 
-  /* Analytics page (static labels) */
-  setTxt("analytics-title",      t("analyticsTitle"));
-  setTxt("btn-back-requests",    t("btnBackToRequests"));
-  setTxt("chart-site-hd",        t("chartBySite"));
-  setTxt("chart-cat-hd",         t("chartByCat"));
-  setTxt("chart-products-hd",    t("chartTopProducts"));
-  setTxt("chart-workers-hd",     t("chartWorkers"));
-  setTxt("chart-spend-hd",       t("chartSpend"));
-  setTxt("export-title",         t("exportTitle"));
-  setTxt("btn-download-csv",     t("btnDownloadCSV"));
+  /* Analytics */
+  setTxt("analytics-title",   t("analyticsTitle"));
+  setTxt("btn-back-requests", t("btnBackToRequests"));
+  setTxt("chart-site-hd",     t("chartBySite"));
+  setTxt("chart-cat-hd",      t("chartByCat"));
+  setTxt("chart-products-hd", t("chartTopProducts"));
+  setTxt("chart-workers-hd",  t("chartWorkers"));
+  setTxt("chart-spend-hd",    t("chartSpend"));
+  setTxt("export-title",      t("exportTitle"));
+  setTxt("btn-download-csv",  t("btnDownloadCSV"));
 
-  /* Re-render dynamic content so translated strings appear in cards */
+  /* Re-render dynamic content */
   if (currentRole === "supervisor") {
     render();
-    const analyticsVisible = document.getElementById("page-analytics").style.display !== "none";
-    if (analyticsVisible) renderAnalytics(requests);
+    if (document.getElementById("page-analytics").style.display !== "none") {
+      renderAnalytics(requests);
+    }
   }
 }
 
@@ -164,12 +160,11 @@ window.selectRole = function (role) {
 
 window.confirmPin = function () {
   const pin = document.getElementById("gate-pin").value;
-  const err = document.getElementById("gate-pin-error");
   if (pin === SUPERVISOR_PIN) {
-    err.style.display = "none";
+    document.getElementById("gate-pin-error").style.display = "none";
     enterApp("supervisor");
   } else {
-    err.style.display = "";
+    document.getElementById("gate-pin-error").style.display = "";
     document.getElementById("gate-pin").value = "";
     document.getElementById("gate-pin").focus();
   }
@@ -194,24 +189,21 @@ window.signOut = function () {
 function enterApp(role) {
   currentRole = role;
   sessionStorage.setItem("srt_role", role);
-  applyRole(role);
   document.getElementById("gate").style.display = "none";
   document.getElementById("app").style.display = "";
+  applyRole(role);
+  applyTranslations();
 }
 
 function applyRole(role) {
-  updateRolePill();
-
   document.querySelectorAll(".mgmt-only").forEach(el => {
     el.style.display = role === "supervisor" ? "" : "none";
   });
-
+  updateRolePill();
   if (role === "supervisor") {
-    setTxt("header-sub", t("headerSubMgmt"));
     showPage("list");
     render();
   } else {
-    setTxt("header-sub", t("headerSubWorker"));
     showPage("new");
     document.getElementById("worker-success").style.display = "none";
     document.getElementById("form-card").style.display = "";
@@ -238,8 +230,11 @@ function updateRolePill() {
 function init() {
   requests = loadRequests();
   rebuildFilters();
-  applyTranslations(); // apply saved language on load
 
+  // Apply saved language immediately (even on gate screen)
+  applyTranslations();
+
+  // Resume session
   const savedRole = sessionStorage.getItem("srt_role");
   if (savedRole) enterApp(savedRole);
 }
@@ -249,12 +244,10 @@ function init() {
    ══════════════════════════════════════════ */
 window.showPage = function (p) {
   if (currentRole === "worker" && (p === "list" || p === "analytics")) return;
-
   document.getElementById("page-list").style.display      = p === "list"      ? "" : "none";
   document.getElementById("page-new").style.display       = p === "new"       ? "" : "none";
   document.getElementById("page-analytics").style.display = p === "analytics" ? "" : "none";
-  document.getElementById("main-nav").style.display       = (p === "list" && currentRole === "supervisor") ? "" : "none";
-
+  document.getElementById("main-nav").style.display = (p === "list" && currentRole === "supervisor") ? "" : "none";
   if (p === "analytics") renderAnalytics(requests);
 };
 
@@ -288,8 +281,8 @@ window.switchTab = function (tab) {
 /* ── Filters / datalists ── */
 function rebuildSiteList() {
   const sites = [...new Set(requests.map(r => r.site).filter(Boolean))];
-  const dl = document.getElementById("site-list");
-  dl.innerHTML = sites.map(s => `<option value="${escHtml(s)}">`).join("");
+  document.getElementById("site-list").innerHTML =
+    sites.map(s => `<option value="${escHtml(s)}">`).join("");
 }
 
 function rebuildFilters() {
@@ -318,12 +311,10 @@ window.submitRequest = function () {
   const cost     = parseFloat(document.getElementById("f-cost").value) || null;
 
   requests.unshift({
-    id: Date.now(),
-    name, site, product,
+    id: Date.now(), name, site, product,
     category:  document.getElementById("f-cat").value,
     qty:       document.getElementById("f-qty").value.trim(),
-    cost,
-    priority,
+    cost, priority,
     frequency: document.getElementById("f-freq").value,
     supplier:  document.getElementById("f-supplier").value.trim(),
     notes:     document.getElementById("f-notes").value.trim(),
@@ -385,10 +376,10 @@ function filtered() {
 
 /* ── Render list ── */
 window.render = function () {
-  document.getElementById("cnt-pending").textContent = requests.filter(r => r.status === "pending" && r.priority !== "urgent").length;
-  document.getElementById("cnt-urgent").textContent  = requests.filter(r => r.status === "pending" && r.priority === "urgent").length;
-  document.getElementById("cnt-ordered").textContent = requests.filter(r => r.status === "ordered").length;
-  document.getElementById("cnt-done").textContent    = requests.filter(r => r.status === "done").length;
+  document.getElementById("cnt-pending").textContent = requests.filter(r => r.status==="pending" && r.priority!=="urgent").length;
+  document.getElementById("cnt-urgent").textContent  = requests.filter(r => r.status==="pending" && r.priority==="urgent").length;
+  document.getElementById("cnt-ordered").textContent = requests.filter(r => r.status==="ordered").length;
+  document.getElementById("cnt-done").textContent    = requests.filter(r => r.status==="done").length;
   document.getElementById("cnt-all").textContent     = requests.length;
 
   const list = filtered();
@@ -400,21 +391,21 @@ window.render = function () {
   }
 
   body.innerHTML = list.map(r => {
-    const bClass = r.status === "done"    ? "b-done"    :
-                   r.status === "ordered" ? "b-ordered" :
-                   r.priority === "urgent"? "b-urgent"  : "b-pending";
-    const bLabel = r.status === "done"    ? t("statusDone")    :
-                   r.status === "ordered" ? t("statusOrdered") :
-                   r.priority === "urgent"? t("statusUrgent")  : t("statusPending");
+    const bClass = r.status==="done"    ? "b-done"    :
+                   r.status==="ordered" ? "b-ordered" :
+                   r.priority==="urgent"? "b-urgent"  : "b-pending";
+    const bLabel = r.status==="done"    ? t("statusDone")    :
+                   r.status==="ordered" ? t("statusOrdered") :
+                   r.priority==="urgent"? t("statusUrgent")  : t("statusPending");
 
-    const actionBtns = [];
+    const btns = [];
     if (r.status === "pending")
-      actionBtns.push(`<button class="btn btn-sm" onclick="setStatus(${r.id},'ordered')">${t("btnMarkOrdered")}</button>`);
+      btns.push(`<button class="btn btn-sm" onclick="setStatus(${r.id},'ordered')">${t("btnMarkOrdered")}</button>`);
     if (r.status !== "done")
-      actionBtns.push(`<button class="btn btn-sm" style="color:var(--color-text-success);border-color:var(--color-border-success);" onclick="setStatus(${r.id},'done')">${t("btnMarkDone")}</button>`);
+      btns.push(`<button class="btn btn-sm" style="color:var(--color-text-success);border-color:var(--color-border-success);" onclick="setStatus(${r.id},'done')">${t("btnMarkDone")}</button>`);
     if (r.status === "done")
-      actionBtns.push(`<button class="btn btn-sm" onclick="setStatus(${r.id},'pending')">${t("btnReopen")}</button>`);
-    actionBtns.push(`<button class="btn btn-sm" onclick="deleteReq(${r.id})">${t("btnRemove")}</button>`);
+      btns.push(`<button class="btn btn-sm" onclick="setStatus(${r.id},'pending')">${t("btnReopen")}</button>`);
+    btns.push(`<button class="btn btn-sm" onclick="deleteReq(${r.id})">${t("btnRemove")}</button>`);
 
     return `<div class="card">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
@@ -427,14 +418,14 @@ window.render = function () {
           <div class="req-meta">
             ${t("cardBy")} <strong>${escHtml(r.name)}</strong> &middot; ${r.date}
             ${r.supplier?` &middot; ${t("cardSupplier")}: ${escHtml(r.supplier)}`:""}
-            ${r.frequency && r.frequency!=="one-off"?` &middot; ${escHtml(r.frequency)}`:""}
-            ${r.cost!=null?` &middot; ~$${r.cost.toFixed(2)}`:""}
+            ${r.frequency&&r.frequency!=="one-off"?` &middot; ${escHtml(r.frequency)}`:""}
+            ${r.cost!=null?` &middot; ~${r.cost.toFixed(2)} €`:""}
             ${r.notes?`<br>${escHtml(r.notes)}`:""}
           </div>
         </div>
         <span class="badge ${bClass}" style="flex-shrink:0;">${bLabel}</span>
       </div>
-      <div class="row-actions">${actionBtns.join("")}</div>
+      <div class="row-actions">${btns.join("")}</div>
     </div>`;
   }).join("");
 };

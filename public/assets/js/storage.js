@@ -8,9 +8,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 /* ── 1. Supabase client ─────────────────────────────────────── */
-
-const SUPABASE_URL  = "https://ladegkuspzuyqauupbje.supabase.co";   // e.g. https://xyzxyz.supabase.co
-const SUPABASE_ANON = "sb_publishable_NQoCtnl8xD6xBTG92Ih-2w_z6lHP7tD";
+import { SUPABASE_URL, SUPABASE_ANON } from "./config.js";
+//const SUPABASE_URL  = "https://ladegkuspzuyqauupbje.supabase.co";   // e.g. https://xyzxyz.supabase.co
+//const SUPABASE_ANON = "sb_publishable_NQoCtnl8xD6xBTG92Ih-2w_z6lHP7tD";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 

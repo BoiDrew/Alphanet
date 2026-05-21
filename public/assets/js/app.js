@@ -19,114 +19,38 @@ const SUPERVISOR_PIN = "1234";
 /* ── State ── */
 let requests    = [];
 let currentTab  = "pending";
-let currentRole = null; // "worker" | "supervisor"
+let currentRole = null;
 
 /* ══════════════════════════════════════════
-   LANGUAGE TOGGLE
+   DOM HELPERS
    ══════════════════════════════════════════ */
-window.toggleLang = function () {
-  setLang(currentLang === "fr" ? "en" : "fr");
-  applyTranslations();
-};
 
-function applyTranslations() {
-  document.documentElement.lang = currentLang;
-
-  document.querySelectorAll(".lang-toggle").forEach(el => {
-    el.textContent = currentLang === "fr" ? "🇬🇧 EN" : "🇫🇷 FR";
-  });
-
-  setTxt("gate-title",        t("gateTitle"));
-  setTxt("gate-sub-text",     t("gateSub"));
-  setTxt("gate-worker-label", t("gateWorkerLabel"));
-  setTxt("gate-worker-desc",  t("gateWorkerDesc"));
-  setTxt("gate-super-label",  t("gateSuperLabel"));
-  setTxt("gate-super-desc",   t("gateSuperDesc"));
-  setTxt("gate-pin-label",    t("gatePinPrompt"));
-  setTxt("gate-pin-enter",    t("gatePinEnter"));
-  setTxt("gate-pin-back",     t("gatePinBack"));
-  setTxt("gate-pin-error",    t("gatePinError"));
-
-  setTxt("app-title",      t("appTitle"));
-  if (currentRole === "supervisor") setTxt("header-sub", t("headerSubMgmt"));
-  if (currentRole === "worker")     setTxt("header-sub", t("headerSubWorker"));
-  setTxt("sign-out-btn",    t("signOut"));
-  setTxt("btn-new-request", t("btnNewRequest"));
-  setTxt("btn-analytics",   t("btnAnalytics"));
-  updateRolePill();
-
-  setTxt("tab-pending", t("tabPending"));
-  setTxt("tab-urgent",  t("tabUrgent"));
-  setTxt("tab-ordered", t("tabOrdered"));
-  setTxt("tab-done",    t("tabDone"));
-  setTxt("tab-all",     t("tabAll"));
-
-  setFirstOption("filter-site", t("filterAllSites"));
-  setFirstOption("filter-cat",  t("filterAllCats"));
-  setAttr("filter-search", "placeholder", t("filterSearch"));
-
-  setTxt("form-title",     t("formTitle"));
-  setTxt("label-name",     t("fieldName"));
-  setAttr("f-name",        "placeholder", t("fieldNamePH"));
-  setTxt("label-site",     t("fieldSite"));
-  setAttr("f-site",        "placeholder", t("fieldSitePH"));
-  setTxt("label-product",  t("fieldProduct"));
-  setAttr("f-product",     "placeholder", t("fieldProductPH"));
-  setTxt("label-category", t("fieldCategory"));
-  setTxt("label-qty",      t("fieldQty"));
-  setAttr("f-qty",         "placeholder", t("fieldQtyPH"));
-  setTxt("label-cost",     t("fieldCost"));
-  setAttr("f-cost",        "placeholder", t("fieldCostPH"));
-  setTxt("label-priority", t("fieldPriority"));
-  setTxt("label-freq",     t("fieldFreq"));
-  setTxt("label-supplier", t("fieldSupplier"));
-  setAttr("f-supplier",    "placeholder", t("fieldSupplierPH"));
-  setTxt("label-notes",    t("fieldNotes"));
-  setAttr("f-notes",       "placeholder", t("fieldNotesPH"));
-  setTxt("btn-submit",     t("btnSubmit"));
-  setTxt("btn-cancel",     t("btnCancel"));
-
-  setOption("f-cat", "Cleaning chemicals", t("catChemicals"));
-  setOption("f-cat", "Equipment",          t("catEquipment"));
-  setOption("f-cat", "Disposables",        t("catDisposables"));
-  setOption("f-cat", "PPE",                t("catPPE"));
-  setOption("f-cat", "Paper products",     t("catPaper"));
-  setOption("f-cat", "Tools",              t("catTools"));
-  setOption("f-cat", "Other",              t("catOther"));
-  setOption("f-priority", "normal",        t("priorityNormal"));
-  setOption("f-priority", "urgent",        t("priorityUrgent"));
-  setOption("f-freq", "one-off",           t("freqOneOff"));
-  setOption("f-freq", "weekly",            t("freqWeekly"));
-  setOption("f-freq", "monthly",           t("freqMonthly"));
-  setOption("f-freq", "as needed",         t("freqAsNeeded"));
-
-  setTxt("success-title", t("successTitle"));
-  setTxt("success-msg",   t("successMsg"));
-  setTxt("btn-another",   t("btnAnother"));
-
-  setTxt("analytics-title",   t("analyticsTitle"));
-  setTxt("btn-back-requests", t("btnBackToRequests"));
-  setTxt("chart-site-hd",     t("chartBySite"));
-  setTxt("chart-cat-hd",      t("chartByCat"));
-  setTxt("chart-products-hd", t("chartTopProducts"));
-  setTxt("chart-workers-hd",  t("chartWorkers"));
-  setTxt("chart-spend-hd",    t("chartSpend"));
-  setTxt("export-title",      t("exportTitle"));
-  setTxt("btn-download-csv",  t("btnDownloadCSV"));
-
-  if (currentRole === "supervisor") {
-    render();
-    if (document.getElementById("page-analytics").style.display !== "none") {
-      renderAnalytics(requests);
+// Safe text setter — only updates the direct text node,
+// leaving any child elements (like <span class="cnt">) intact.
+function setTxt(id, text) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  // Find or create a direct text node at the START of the element
+  let textNode = null;
+  for (const node of el.childNodes) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      textNode = node;
+      break;
     }
+  }
+  if (textNode) {
+    textNode.textContent = text + " ";
+  } else {
+    el.insertBefore(document.createTextNode(text + " "), el.firstChild);
   }
 }
 
-/* DOM helpers */
-function setTxt(id, text) {
+// For elements that have NO child elements — safe to set textContent directly
+function setTxtFull(id, text) {
   const el = document.getElementById(id);
   if (el) el.textContent = text;
 }
+
 function setAttr(id, attr, val) {
   const el = document.getElementById(id);
   if (el) el[attr] = val;
@@ -143,6 +67,116 @@ function setOption(selectId, value, text) {
 }
 
 /* ══════════════════════════════════════════
+   LANGUAGE TOGGLE
+   ══════════════════════════════════════════ */
+window.toggleLang = function () {
+  setLang(currentLang === "fr" ? "en" : "fr");
+  applyTranslations();
+};
+
+function applyTranslations() {
+  document.documentElement.lang = currentLang;
+
+  document.querySelectorAll(".lang-toggle").forEach(el => {
+    el.textContent = currentLang === "fr" ? "🇬🇧 EN" : "🇫🇷 FR";
+  });
+
+  // Gate strings — no child elements, safe to use setTxtFull
+  setTxtFull("gate-title",        t("gateTitle"));
+  setTxtFull("gate-sub-text",     t("gateSub"));
+  setTxtFull("gate-worker-label", t("gateWorkerLabel"));
+  setTxtFull("gate-worker-desc",  t("gateWorkerDesc"));
+  setTxtFull("gate-super-label",  t("gateSuperLabel"));
+  setTxtFull("gate-super-desc",   t("gateSuperDesc"));
+  setTxtFull("gate-pin-label",    t("gatePinPrompt"));
+  setTxtFull("gate-pin-enter",    t("gatePinEnter"));
+  setTxtFull("gate-pin-back",     t("gatePinBack"));
+  setTxtFull("gate-pin-error",    t("gatePinError"));
+
+  // Header
+  setTxtFull("app-title", t("appTitle"));
+  if (currentRole === "supervisor") setTxtFull("header-sub", t("headerSubMgmt"));
+  if (currentRole === "worker")     setTxtFull("header-sub", t("headerSubWorker"));
+  setTxtFull("sign-out-btn",    t("signOut"));
+  setTxtFull("btn-new-request", t("btnNewRequest"));
+  setTxtFull("btn-analytics",   t("btnAnalytics"));
+  updateRolePill();
+
+  // ── Tabs: use setTxt (safe — preserves the <span class="cnt"> child) ──
+  setTxt("tab-pending", t("tabPending"));
+  setTxt("tab-urgent",  t("tabUrgent"));
+  setTxt("tab-ordered", t("tabOrdered"));
+  setTxt("tab-done",    t("tabDone"));
+  setTxt("tab-all",     t("tabAll"));
+
+  // Filters
+  setFirstOption("filter-site", t("filterAllSites"));
+  setFirstOption("filter-cat",  t("filterAllCats"));
+  setAttr("filter-search", "placeholder", t("filterSearch"));
+
+  // Form labels — no child elements
+  setTxtFull("form-title",     t("formTitle"));
+  setTxtFull("label-name",     t("fieldName"));
+  setAttr("f-name",        "placeholder", t("fieldNamePH"));
+  setTxtFull("label-site",     t("fieldSite"));
+  setAttr("f-site",        "placeholder", t("fieldSitePH"));
+  setTxtFull("label-product",  t("fieldProduct"));
+  setAttr("f-product",     "placeholder", t("fieldProductPH"));
+  setTxtFull("label-category", t("fieldCategory"));
+  setTxtFull("label-qty",      t("fieldQty"));
+  setAttr("f-qty",         "placeholder", t("fieldQtyPH"));
+  setTxtFull("label-cost",     t("fieldCost"));
+  setAttr("f-cost",        "placeholder", t("fieldCostPH"));
+  setTxtFull("label-priority", t("fieldPriority"));
+  setTxtFull("label-freq",     t("fieldFreq"));
+  setTxtFull("label-supplier", t("fieldSupplier"));
+  setAttr("f-supplier",    "placeholder", t("fieldSupplierPH"));
+  setTxtFull("label-notes",    t("fieldNotes"));
+  setAttr("f-notes",       "placeholder", t("fieldNotesPH"));
+  setTxtFull("btn-submit",     t("btnSubmit"));
+  setTxtFull("btn-cancel",     t("btnCancel"));
+
+  // Select options
+  setOption("f-cat", "Cleaning chemicals", t("catChemicals"));
+  setOption("f-cat", "Equipment",          t("catEquipment"));
+  setOption("f-cat", "Disposables",        t("catDisposables"));
+  setOption("f-cat", "PPE",                t("catPPE"));
+  setOption("f-cat", "Paper products",     t("catPaper"));
+  setOption("f-cat", "Tools",              t("catTools"));
+  setOption("f-cat", "Other",              t("catOther"));
+  setOption("f-priority", "normal",        t("priorityNormal"));
+  setOption("f-priority", "urgent",        t("priorityUrgent"));
+  setOption("f-freq", "one-off",           t("freqOneOff"));
+  setOption("f-freq", "weekly",            t("freqWeekly"));
+  setOption("f-freq", "monthly",           t("freqMonthly"));
+  setOption("f-freq", "as needed",         t("freqAsNeeded"));
+
+  // Worker success screen
+  setTxtFull("success-title", t("successTitle"));
+  setTxtFull("success-msg",   t("successMsg"));
+  setTxtFull("btn-another",   t("btnAnother"));
+
+  // Analytics
+  setTxtFull("analytics-title",   t("analyticsTitle"));
+  setTxtFull("btn-back-requests", t("btnBackToRequests"));
+  setTxtFull("chart-site-hd",     t("chartBySite"));
+  setTxtFull("chart-cat-hd",      t("chartByCat"));
+  setTxtFull("chart-products-hd", t("chartTopProducts"));
+  setTxtFull("chart-workers-hd",  t("chartWorkers"));
+  setTxtFull("chart-spend-hd",    t("chartSpend"));
+  setTxtFull("export-title",      t("exportTitle"));
+  setTxtFull("btn-download-csv",  t("btnDownloadCSV"));
+
+  // Re-render the list so status labels etc. update in the active language
+  if (currentRole === "supervisor") {
+    render();
+    if (document.getElementById("page-analytics").style.display !== "none") {
+      renderAnalytics(requests);
+    }
+  }
+}
+
+/* ══════════════════════════════════════════
    ROLE GATE
    ══════════════════════════════════════════ */
 window.selectRole = function (role) {
@@ -150,7 +184,7 @@ window.selectRole = function (role) {
     document.getElementById("gate-pin-wrap").style.display = "";
     document.getElementById("gate-pin").focus();
     document.querySelector(".gate-btns").style.display = "none";
-    setTxt("gate-sub-text", t("gatePinSubtitle"));
+    setTxtFull("gate-sub-text", t("gatePinSubtitle"));
   } else {
     enterApp("worker");
   }
@@ -173,12 +207,13 @@ window.cancelPin = function () {
   document.getElementById("gate-pin").value = "";
   document.getElementById("gate-pin-error").style.display = "none";
   document.querySelector(".gate-btns").style.display = "";
-  setTxt("gate-sub-text", t("gateSub"));
+  setTxtFull("gate-sub-text", t("gateSub"));
 };
 
 window.signOut = function () {
   sessionStorage.removeItem("srt_role");
   currentRole = null;
+  requests = [];
   document.getElementById("gate").style.display = "";
   document.getElementById("app").style.display = "none";
   window.cancelPin();
@@ -190,16 +225,21 @@ async function enterApp(role) {
   document.getElementById("gate").style.display = "none";
   document.getElementById("app").style.display = "";
 
-  // Show a loading indicator briefly while data fetches
-  showLoading(true);
-  requests = await loadRequests();
-  showLoading(false);
-
+  // Apply role-based visibility FIRST (so mgmt-only elements show/hide correctly)
   applyRole(role);
+
+  // Apply translations AFTER role (tabs are visible now, setTxt will find them)
   applyTranslations();
 
-  // Only supervisors need realtime updates
+  // Fetch data — render() is called again after this so counts update correctly
   if (role === "supervisor") {
+    showLoading(true);
+    requests = await loadRequests();
+    showLoading(false);
+    rebuildFilters();
+    render();
+
+    // Subscribe to realtime updates
     subscribeToRequests((updatedList) => {
       requests = updatedList;
       rebuildFilters();
@@ -212,17 +252,18 @@ async function enterApp(role) {
 }
 
 function applyRole(role) {
-  // Cost field grid: 3-col for supervisors (qty + cost + priority), 2-col for workers (qty + priority)
+  // Cost field grid: 3-col for supervisors, 2-col for workers
   const costGrid = document.getElementById("cost-grid");
   if (costGrid) costGrid.className = role === "supervisor" ? "grid3" : "grid2";
+
   document.querySelectorAll(".mgmt-only").forEach(el => {
     el.style.display = role === "supervisor" ? "" : "none";
   });
+
   updateRolePill();
+
   if (role === "supervisor") {
-    rebuildFilters();
     showPage("list");
-    render();
   } else {
     showPage("new");
     document.getElementById("worker-success").style.display = "none";
@@ -263,21 +304,21 @@ function showLoading(on) {
    INIT
    ══════════════════════════════════════════ */
 async function init() {
-  // Apply language first — gate is visible immediately
+  // Language first — gate screen must be translated immediately
   applyTranslations();
 
-  // Try to sync any queued offline operations
+  // Sync any offline queued operations
   window.addEventListener("online", syncOfflineQueue);
   syncOfflineQueue();
 
-  // Resume session if still valid
+  // Resume session if still valid this browser session
   const savedRole = sessionStorage.getItem("srt_role");
   if (savedRole) {
     await enterApp(savedRole);
     return;
   }
 
-  // Run one-time migration from localStorage if old data exists
+  // One-time migration from old localStorage data if it exists
   const legacyData = localStorage.getItem("cleaning_requests_v2");
   if (legacyData) {
     const count = await migrateLocalStorageToSupabase();
@@ -293,7 +334,8 @@ window.showPage = function (p) {
   document.getElementById("page-list").style.display      = p === "list"      ? "" : "none";
   document.getElementById("page-new").style.display       = p === "new"       ? "" : "none";
   document.getElementById("page-analytics").style.display = p === "analytics" ? "" : "none";
-  document.getElementById("main-nav").style.display = (p === "list" && currentRole === "supervisor") ? "" : "none";
+  document.getElementById("main-nav").style.display =
+    (p === "list" && currentRole === "supervisor") ? "" : "none";
   if (p === "analytics") renderAnalytics(requests);
 };
 
@@ -310,15 +352,19 @@ window.workerNewRequest = function () {
   resetForm();
 };
 
+/* ── Tabs ── */
 window.switchTab = function (tab) {
   currentTab = tab;
-  document.querySelectorAll("#main-nav .tab").forEach((el, i) => {
-    el.classList.toggle("active", ["pending","urgent","ordered","done","all"][i] === tab);
+  const tabIds = ["tab-pending","tab-urgent","tab-ordered","tab-done","tab-all"];
+  const tabKeys = ["pending","urgent","ordered","done","all"];
+  tabIds.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle("active", tabKeys[i] === tab);
   });
   render();
 };
 
-/* ── Filters ── */
+/* ── Filters / datalists ── */
 function rebuildSiteList() {
   const sites = [...new Set(requests.map(r => r.site).filter(Boolean))];
   document.getElementById("site-list").innerHTML =
@@ -348,12 +394,13 @@ window.submitRequest = async function () {
   if (!name || !product || !site) { toast(t("toastRequired")); return; }
 
   const priority = document.getElementById("f-priority").value;
+  const cost     = parseFloat(document.getElementById("f-cost").value) || null;
 
   const req = {
     name, site, product,
     category:  document.getElementById("f-cat").value,
     qty:       document.getElementById("f-qty").value.trim(),
-    cost:      parseFloat(document.getElementById("f-cost").value) || null,
+    cost,
     priority,
     frequency: document.getElementById("f-freq").value,
     supplier:  document.getElementById("f-supplier").value.trim(),
@@ -361,15 +408,20 @@ window.submitRequest = async function () {
     status:    "pending",
   };
 
-  // Optimistic update — add to local list immediately
-  const tempReq = { ...req, id: `temp_${Date.now()}`, date: new Date().toLocaleDateString("fr-FR"), ts: Date.now() };
+  // Optimistic local insert so UI feels instant
+  const tempReq = {
+    ...req,
+    id:   `temp_${Date.now()}`,
+    date: new Date().toLocaleDateString("fr-FR"),
+    ts:   Date.now(),
+  };
   requests.unshift(tempReq);
   rebuildFilters();
 
-  // Persist to Supabase (or queue if offline)
+  // Persist to Supabase (or offline queue)
   const saved = await saveRequest(req);
 
-  // Replace temp record with server record
+  // Replace temp record with the real server record (has a proper UUID)
   const idx = requests.findIndex(r => r.id === tempReq.id);
   if (idx !== -1) requests[idx] = saved;
 
@@ -380,6 +432,8 @@ window.submitRequest = async function () {
   } else {
     resetForm();
     currentTab = priority === "urgent" ? "urgent" : "pending";
+    // Update active tab UI
+    window.switchTab(currentTab);
     showPage("list");
     render();
     toast(t("toastSubmitted"));
@@ -389,12 +443,9 @@ window.submitRequest = async function () {
 /* ── Status update ── */
 window.setStatus = async function (id, status) {
   if (currentRole === "worker") return;
-
-  // Optimistic update
   const r = requests.find(x => x.id === id);
   if (r) r.status = status;
   render();
-
   await updateRequest(id, { status });
   toast(t("toastUpdated"));
 };
@@ -403,12 +454,9 @@ window.setStatus = async function (id, status) {
 window.deleteReq = async function (id) {
   if (currentRole === "worker") return;
   if (!confirm(t("confirmRemove"))) return;
-
-  // Optimistic update
   requests = requests.filter(x => x.id !== id);
   rebuildFilters();
   render();
-
   await deleteRequest(id);
   toast(t("toastRemoved"));
 };
@@ -418,28 +466,36 @@ function filtered() {
   const site = document.getElementById("filter-site").value;
   const cat  = document.getElementById("filter-cat").value;
   const q    = (document.getElementById("filter-search").value || "").toLowerCase();
+
   return requests.filter(r => {
     if (currentTab === "pending" && !(r.status === "pending" && r.priority !== "urgent")) return false;
     if (currentTab === "urgent"  && !(r.status === "pending" && r.priority === "urgent"))  return false;
     if (currentTab === "ordered" && r.status !== "ordered") return false;
     if (currentTab === "done"    && r.status !== "done")    return false;
+    // "all" tab — no status filter
     if (site && r.site !== site) return false;
     if (cat  && r.category !== cat) return false;
-    if (q && !((r.product+r.name+r.site+r.notes).toLowerCase().includes(q))) return false;
+    if (q && !((r.product + r.name + r.site + (r.notes||"")).toLowerCase().includes(q))) return false;
     return true;
   });
 }
 
 /* ── Render ── */
 window.render = function () {
-  document.getElementById("cnt-pending").textContent = requests.filter(r => r.status==="pending" && r.priority!=="urgent").length;
-  document.getElementById("cnt-urgent").textContent  = requests.filter(r => r.status==="pending" && r.priority==="urgent").length;
-  document.getElementById("cnt-ordered").textContent = requests.filter(r => r.status==="ordered").length;
-  document.getElementById("cnt-done").textContent    = requests.filter(r => r.status==="done").length;
-  document.getElementById("cnt-all").textContent     = requests.length;
+  // Update tab count badges — target the <span> directly, not the button
+  const setPill = (id, n) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = n;
+  };
+  setPill("cnt-pending", requests.filter(r => r.status==="pending" && r.priority!=="urgent").length);
+  setPill("cnt-urgent",  requests.filter(r => r.status==="pending" && r.priority==="urgent").length);
+  setPill("cnt-ordered", requests.filter(r => r.status==="ordered").length);
+  setPill("cnt-done",    requests.filter(r => r.status==="done").length);
+  setPill("cnt-all",     requests.length);
 
   const list = filtered();
   const body = document.getElementById("list-body");
+  if (!body) return;
 
   if (!list.length) {
     body.innerHTML = `<div class="empty">${t("noRequests")}</div>`;
@@ -447,12 +503,12 @@ window.render = function () {
   }
 
   body.innerHTML = list.map(r => {
-    const bClass = r.status==="done"    ? "b-done"    :
-                   r.status==="ordered" ? "b-ordered" :
-                   r.priority==="urgent"? "b-urgent"  : "b-pending";
-    const bLabel = r.status==="done"    ? t("statusDone")    :
-                   r.status==="ordered" ? t("statusOrdered") :
-                   r.priority==="urgent"? t("statusUrgent")  : t("statusPending");
+    const bClass = r.status==="done"     ? "b-done"    :
+                   r.status==="ordered"  ? "b-ordered" :
+                   r.priority==="urgent" ? "b-urgent"  : "b-pending";
+    const bLabel = r.status==="done"     ? t("statusDone")    :
+                   r.status==="ordered"  ? t("statusOrdered") :
+                   r.priority==="urgent" ? t("statusUrgent")  : t("statusPending");
 
     const btns = [];
     if (r.status === "pending")
@@ -506,9 +562,8 @@ window.exportCSV = function () {
 
 /* ── Helpers ── */
 function resetForm() {
-  ["f-name","f-site","f-product","f-qty","f-cost","f-supplier","f-notes"].forEach(id => {
-    document.getElementById(id).value = "";
-  });
+  ["f-name","f-site","f-product","f-qty","f-cost","f-supplier","f-notes"]
+    .forEach(id => { document.getElementById(id).value = ""; });
   document.getElementById("f-priority").value = "normal";
   document.getElementById("f-cat").value = "Cleaning chemicals";
   document.getElementById("f-freq").value = "one-off";

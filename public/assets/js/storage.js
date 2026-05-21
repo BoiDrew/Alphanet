@@ -8,10 +8,15 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 /* ── 1. Supabase client ─────────────────────────────────────── */
-const SUPABASE_URL  = "https://ladegkuspzuyqauupbje.supabase.co";   // e.g. https://xyzxyz.supabase.co
-const SUPABASE_ANON = "sb_publishable_NQoCtnl8xD6xBTG92Ih-2w_z6lHP7tD";
+// Values imported from config.js, but with fallback placeholders to prevent runtime errors if config.js is missing or not edited.
+import { SUPABASE_URL, SUPABASE_ANON } from "./config.js";  
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// Create Supabase client
+export const supabase = createClient(
+  CREDENTIALS_SET ? SUPABASE_URL  : "https://placeholder.supabase.co",
+  CREDENTIALS_SET ? SUPABASE_ANON : "placeholder"
+);
 
 /* ── 2. Offline queue (localStorage) ───────────────────────── */
 const QUEUE_KEY = "srt_offline_queue";
@@ -77,7 +82,11 @@ export async function loadRequests() {
     if (error) throw error;
     return (data || []).map(dbRowToApp);
   } catch (e) {
-    console.warn("Supabase load failed, offline mode:", e.message);
+    if (!CREDENTIALS_SET) {
+      console.error("❌ Cannot load requests: Supabase credentials are not configured in storage.js");
+    } else {
+      console.warn("Supabase load failed:", e.message);
+    }
     return [];
   }
 }

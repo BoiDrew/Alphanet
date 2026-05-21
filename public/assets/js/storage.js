@@ -14,8 +14,8 @@ import { SUPABASE_URL, SUPABASE_ANON } from "./config.js";
 
 // Create Supabase client
 export const supabase = createClient(
-  CREDENTIALS_SET ? SUPABASE_URL  : "https://placeholder.supabase.co",
-  CREDENTIALS_SET ? SUPABASE_ANON : "placeholder"
+  SUPABASE_URL,
+  SUPABASE_ANON
 );
 
 /* ── 2. Offline queue (localStorage) ───────────────────────── */

@@ -9,7 +9,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 /* ── 1. Supabase client ─────────────────────────────────────── */
 // Values imported from config.js, but with fallback placeholders to prevent runtime errors if config.js is missing or not edited.
-import { SUPABASE_URL, SUPABASE_ANON } from "./config.js";  
+const SUPABASE_URL  = "https://ladegkuspzuyqauupbje.supabase.co";
+const SUPABASE_ANON = "sb_publishable_NQoCtnl8xD6xBTG92Ih-2w_z6lHP7tD";
 
 
 // Create Supabase client

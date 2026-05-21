@@ -8,13 +8,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 /* ── 1. Supabase client ─────────────────────────────────────── */
-// These values are safe to expose in frontend code.
-// The anon key can only do what Row Level Security allows.
-// Set these as Vercel environment variables and replace below,
-// OR just paste them directly here for quick start.
 
-const SUPABASE_URL  = "YOUR_SUPABASE_URL";   // e.g. https://xyzxyz.supabase.co
-const SUPABASE_ANON = "YOUR_SUPABASE_ANON_KEY";
+const SUPABASE_URL  = "https://ladegkuspzuyqauupbje.supabase.co";   // e.g. https://xyzxyz.supabase.co
+const SUPABASE_ANON = "sb_publishable_NQoCtnl8xD6xBTG92Ih-2w_z6lHP7tD";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
